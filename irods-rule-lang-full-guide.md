@@ -1732,177 +1732,386 @@ Next, we convert this rule into the new rule engine syntax. If a step is written
 
 ### "##" => Rulegen
 
-[1. Insert newlines ]
+#### 1. Insert newlines 
 
-This step is optional. My Test Rule(*arg)
+This step is optional.
 
-msi(*arg) && *arg like *txt  
----  
-  
-delayExec(<A></A>, copyDataObj(*objPath)## moveDataObj(*objPath), nop##nop)##
-remoteExec(localhost, null, writeLine(stdout, *D), nop)## assign(*A, "a, b,
-c")## assign(*B, *A string)## forEachExec(*A, writeLine(serverLog, *A),
-nop)|nop
+````php
+ My Test Rule(*arg)
+     |msi(*arg) && *arg like *txt|
+         delayExec(<A></A>, 
+             copyDataObj(*objPath)##
+             moveDataObj(*objPath), 
+             nop##nop)##
+         remoteExec(localhost, null, 
+             writeLine(stdout, *D), 
+             nop)##
+         assign(*A, "a, b, c")##
+         assign(*B, *A string)##
+         forEachExec(*A, 
+             writeLine(serverLog, *A), 
+             nop)|nop
+ *obj=test.txt%*D=string
+ ruleExecOut
+````
 
-  * obj=test.txt%*D=string ruleExecOut
+#### 2. Convert "|"s to rulegen syntax 
 
-[2. Convert "|"s to rulegen syntax ] My Test Rule(*arg) { on(msi(*arg) && *arg
-like *txt) { delayExec(<A></A>, copyDataObj(*objPath)## moveDataObj(*objPath),
-nop##nop)## remoteExec(localhost, null, writeLine(stdout, *D), nop)##
-assign(*A, "a, b, c")## assign(*B, *A string)## forEachExec(*A,
-writeLine(serverLog, *A), nop) } }
+````php
+ My Test Rule(*arg) {
+     on(msi(*arg) && *arg like *txt) {
+         delayExec(<A></A>, 
+             copyDataObj(*objPath)##
+             moveDataObj(*objPath), 
+             nop##nop)##
+         remoteExec(localhost, null, 
+             writeLine(stdout, *D), 
+             nop)##
+         assign(*A, "a, b, c")##
+         assign(*B, *A string)##
+         forEachExec(*A, 
+             writeLine(serverLog, *A), 
+             nop)
+     }
+ }
+ *obj=test.txt%*D=string
+ ruleExecOut
+````
+ 
+#### 3. Convert "##"s to ";" 
 
-  * obj=test.txt%*D=string ruleExecOut
-
-[3. Convert "##"s to ";" ] My Test Rule(*arg) { on(msi(*arg) && *arg like
-*txt) { delayExec(<A></A>, copyDataObj(*objPath); moveDataObj(*objPath),
-nop;nop); remoteExec(localhost, null, writeLine(stdout, *D), nop); assign(*A,
-"a, b, c"); assign(*B, *A string); forEachExec(*A, writeLine(serverLog, *A),
-nop) } }
-
-  * obj=test.txt%*D=string ruleExecOut
-
-[4. Convert delayExec, remoteExec, assign, forEachExec, etc. to rulegen
-syntax]
+````php
+ My Test Rule(*arg) {
+     on(msi(*arg) && *arg like *txt) {
+         delayExec(<A></A>, 
+             copyDataObj(*objPath);
+             moveDataObj(*objPath), 
+             nop;nop);
+         remoteExec(localhost, null, 
+             writeLine(stdout, *D), 
+             nop);
+         assign(*A, "a, b, c");
+         assign(*B, *A string);
+         forEachExec(*A, 
+             writeLine(serverLog, *A), 
+             nop)
+     }
+ }
+ *obj=test.txt%*D=string
+ ruleExecOut
+````
+ 
+#### 4. Convert delayExec, remoteExec, assign, forEachExec, etc. to rulegen syntax
 
 In this step, you can add or remove ";"s to make it follow the C conventions.
-My Test Rule(*arg) { on(msi(*arg) && *arg like *txt) { delay(<A></A>) {
-copyDataObj(*objPath):::nop; moveDataObj(*objPath):::nop; } remote(localhost,
-null) { writeLine(stdout, *D):::nop; }
 
-  * A = "a, b, c";
-  * B = *A string; foreach(*A) { writeLine(serverLog, *A):::nop; } } }
-  * obj=test.txt%*D=string ruleExecOut
+````php
+ My Test Rule(*arg) {
+     on(msi(*arg) && *arg like *txt) {
+         delay(<A></A>) { 
+             copyDataObj(*objPath):::nop;
+             moveDataObj(*objPath):::nop;
+         }
+         remote(localhost, null) { 
+             writeLine(stdout, *D):::nop;
+         }
+         *A = "a, b, c";
+         *B = *A string;
+         foreach(*A) { 
+             writeLine(serverLog, *A):::nop;
+         }
+     }
+ }
+ *obj=test.txt%*D=string
+ ruleExecOut
+````
+ 
+#### 5. Convert input and output to rulegen syntax
 
-[5. Convert input and output to rulegen syntax]
+````php
+ My Test Rule(*arg) {
+     on(msi(*arg) && *arg like *txt) {
+         delay(<A></A>) { 
+             copyDataObj(*objPath):::nop;
+             moveDataObj(*objPath):::nop;
+         }
+         remote(localhost, null) { 
+             writeLine(stdout, *D):::nop;
+         }
+         *A = "a, b, c";
+         *B = *A string;
+         foreach(*A) { 
+             writeLine(serverLog, *A):::nop;
+         }
+     }
+ }
+ input *obj=test.txt, *D=string
+ output ruleExecOut
+````
 
-My Test Rule(*arg) { on(msi(*arg) && *arg like *txt) { delay(<A></A>) {
-copyDataObj(*objPath):::nop; moveDataObj(*objPath):::nop; } remote(localhost,
-null) { writeLine(stdout, *D):::nop; }
+#### 6. Delete superfluous nops
 
-  * A = "a, b, c";
-  * B = *A string; foreach(*A) { writeLine(serverLog, *A):::nop; } } } input *obj=test.txt, *D=string output ruleExecOut
+This step is optional
 
-[6. Delete superfluous nops]
-
-This step is optional My Test Rule(*arg) { on(msi(*arg) && *arg like *txt) {
-delay(<A></A>) { copyDataObj(*objPath); moveDataObj(*objPath); }
-remote(localhost, null) { writeLine(stdout, *D); }
-
-  * A = "a, b, c";
-  * B = *A string; foreach(*A) { writeLine(serverLog, *A); } } } input *obj=test.txt, *D=string output ruleExecOut
+````php
+ My Test Rule(*arg) {
+     on(msi(*arg) && *arg like *txt) {
+         delay(<A></A>) { 
+             copyDataObj(*objPath);
+             moveDataObj(*objPath);
+         }
+         remote(localhost, null) { 
+             writeLine(stdout, *D);
+         }
+         *A = "a, b, c";
+         *B = *A string;
+         foreach(*A) { 
+             writeLine(serverLog, *A);
+         }
+     }
+ }
+ input *obj=test.txt, *D=string
+ output ruleExecOut
+````
 
 ### Rulegen => New Rule Engine
 
-7\. Quote strings
+#### 7. Quote strings
 
-The general guideline is simple, if some text is not quoted, then it is parsed
-as code. If you want to pass some argument to a micro service and do not want
-the rule engine to interpret it, then quote the argument to turn it into a
-string. For example, in writeLine(serverLog, *A); "serverLog" is interpreted
-by the rule engine as a microservice/rule because it is not quoted. The rule
-engine will try to execute that microservice/rule and will pass the return
-value in as the argument. To pass "serverLog" as the argument, it has to be
-quoted. writeLine("serverLog", *A);
+The general guideline is simple, if some text is not quoted, then it is parsed as code. If you want to pass some argument to a micro service and do not want the rule engine to interpret it, then quote the argument to turn it into a string. For example, in
 
-Similarly, the arguments to remote and delay are also strings. So, they need
-to be quoted.
+````php
+writeLine(serverLog, *A);
+````
 
-On the right hand side of an assign statement, we also need to quote the
-string. If the right hand side is an expression we don't quote it. For
-example,
+"serverLog" is interpreted by the rule engine as a microservice/rule because it is not quoted. The rule engine will try to execute that microservice/rule and will pass the return value in as the argument. To pass "serverLog" as the argument, it has to be quoted.
 
-  * A = "0 + 1" assigns the string "0 + 1" to *A, and
-  * A = 0 + 1 assigns 1 to *A
+````php
+ writeLine("serverLog", *A);
+````
 
-On the right hand side of the like expression, we need to quote the pattern
-because it is also a string.
+Similarly, the arguments to remote and delay are also strings. So, they need to be quoted.
+On the right hand side of an assign statement, we also need to quote the string. If the right hand side is an expression we don't quote it. For example
 
+````php
+ *A = "0 + 1"
+````
+
+assigns the string "0 + 1" to *A, and
+
+````php
+ *A = 0 + 1
+````
+
+assigns 1 to *A
+
+On the right hand side of the like expression, we need to quote the pattern because it is also a string.
 The input parameters are also strings, and we need to quote them.
+The rule now looks like:
 
-The rule now looks like: My Test Rule(*arg) { on(msi(*arg) && *arg like
-"*txt") { delay("<A></A>") { copyDataObj(*objPath); moveDataObj(*objPath); }
-remote("localhost", "null") { writeLine("stdout", *D); }
+````php
+ My Test Rule(*arg) {
+     on(msi(*arg) && *arg like "*txt") {
+         delay("<A></A>") { 
+             copyDataObj(*objPath);
+             moveDataObj(*objPath);
+         }
+         remote("localhost", "null") { 
+             writeLine("stdout", *D);
+         }
+         *A = "a, b, c";
+         *B = "*A string";
+         foreach(*A) { 
+             writeLine("serverLog", *A);
+         }
+     }
+ }
+ input *arg="test.txt", *D="string"
+ output ruleExecOut
+````
+ 
+#### 8. Escape special characters in strings
+Special character such as "*" may be interpreted by the rule engine even in quoted strings. For example, in
 
-  * A = "a, b, c";
-  * B = "*A string"; foreach(*A) { writeLine("serverLog", *A); } } } input *arg="test.txt", *D="string" output ruleExecOut
+````php
+*arg like "*txt"
+````
 
-8\. Escape special characters in strings
+```*txt``` is considered a variable which is expanded into the string. However, what we intended to do is to use ```*txt``` as a pattern. Therefore the ```*``` should not be interpreted by the rule engine. To do this we convert it to "\*txt". Details on special characters can be found in Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine#Strings.
 
-Special character such as "*" may be interpreted by the rule engine even in
-quoted strings. For example, in
+````php
+ My Test Rule(*arg) {
+     on(msi(*arg) && *arg like "\*txt") {
+         delay("<A></A>") { 
+             copyDataObj(*objPath);
+             moveDataObj(*objPath);
+         }
+         remote("localhost", "null") { 
+             writeLine("stdout", *D);
+         }
+         *A = "a, b, c";
+         *B = "*A string";
+         foreach(*A) { 
+             writeLine("serverLog", *A);
+         }
+     }
+ }
+ input *arg="test.txt", *D="string"
+ output ruleExecOut
+````
+ 
+9. Delete white spaces in rule names.
 
-  * arg like "*txt" "*txt" is considered a variable which is expanded into the string. However, what we intended to do is to use "*txt" as a pattern. Therefore the "*" should not be interpreted by the rule engine. To do this we convert it to "\\*txt". Details on special characters can be found in [Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine#Strings](Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine#Strings). My Test Rule(*arg) { on(msi(*arg) && *arg like "\\*txt") { delay("<A></A>") { copyDataObj(*objPath); moveDataObj(*objPath); } remote("localhost", "null") { writeLine("stdout", *D); }
-  * A = "a, b, c";
-  * B = "*A string"; foreach(*A) { writeLine("serverLog", *A); } } } input *arg="test.txt", *D="string" output ruleExecOut
+Rule names must be valid identifiers generated from the following regular expression
 
-9\. Delete white spaces in rule names.
+````php
+ <letter> (<letter>|<digit>)*
+````
 
-Rule names must be valid identifiers generated from the following regular
-expression <letter> (<letter>|<digit>)* where <letter> ::= a|...|z|A|...|Z
-<digit> ::= 0|...|9 Now, the rule looks like: MyTestRule(*arg) { on(msi(*arg)
-&& *arg like "\\*txt") { delay("<A></A>") { copyDataObj(*objPath);
-moveDataObj(*objPath); } remote("localhost", "null") { writeLine("stdout",
-*D); }
+where
 
-  * A = "a, b, c";
-  * B = "*A string"; foreach(*A) { writeLine("serverLog", *A); } } } input *arg="test.txt", *D="string" output ruleExecOut
+````php
+ <letter> ::= a|...|z|A|...|Z
+ <digit>  ::= 0|...|9
+````
+ 
+Now, the rule looks like:
+ 
+````php
+ MyTestRule(*arg) {
+     on(msi(*arg) && *arg like "\*txt") {
+         delay("<A></A>") { 
+             copyDataObj(*objPath);
+             moveDataObj(*objPath);
+         }
+         remote("localhost", "null") { 
+             writeLine("stdout", *D);
+         }
+         *A = "a, b, c";
+         *B = "*A string";
+         foreach(*A) { 
+             writeLine("serverLog", *A);
+         }
+     }
+ }
+ input *arg="test.txt", *D="string"
+ output ruleExecOut
+````
+ 
+10. Use split to split the string if it is used as a collection in foreach
+In the new rule engine, "foreach" requires the parameter to be a list or iRODS type `GenQueryOut_PI`. The case where it is a comma separated string can be simulated using the split function:
 
-10\. Use split to split the string if it is used as a collection in foreach
+````php
+ MyTestRule(*arg) {
+     on(msi(*arg) && *arg like "\*txt") {
+         delay("<A></A>") { 
+             copyDataObj(*objPath);
+             moveDataObj(*objPath);
+         }
+         remote("localhost", "null") { 
+             writeLine("stdout", *D);
+         }
+         *A = split("a, b, c", ", ");
+         *B = "*A string";
+         foreach(*A) { 
+             writeLine("serverLog", *A);
+         }
+     }
+ }
+ input *arg="test.txt", *D="string"
+ output ruleExecOut
+````
 
-In the new rule engine, "foreach" requires the parameter to be a list or iRODS
-type `GenQueryOut_PI`. The case where it is a comma separated string can be
-simulated using the split function: MyTestRule(*arg) { on(msi(*arg) && *arg
-like "\\*txt") { delay("<A></A>") { copyDataObj(*objPath);
-moveDataObj(*objPath); } remote("localhost", "null") { writeLine("stdout",
-*D); }
+#### 11. Convert microservice calls in rule conditions
+The micro service call
+ 
+````php
+msi(*arg)
+````
 
-  * A = split("a, b, c", ", ");
-  * B = "*A string"; foreach(*A) { writeLine("serverLog", *A); } } } input *arg="test.txt", *D="string" output ruleExecOut
+in the rule condition returns an integer, if the integer is >= 0 then the microservice is considered successful; otherwise it is considered failed. Therefore, when we write in the old syntax
 
-11\. Convert microservice calls in rule conditions
+````php
+msi(*arg) && *arg like "\*txt"
+````
 
-The micro service call msi(*arg) in the rule condition returns an integer, if
-the integer is >= 0 then the microservice is considered successful; otherwise
-it is considered failed. Therefore, when we write in the old syntax msi(*arg)
-&& *arg like "\\*txt" we are not trying to compute the "logical and" with the
-return code of "msi(*arg)", but with whether "msi(*arg)" succeeds.
+we are not trying to compute the "logical and" with the return code of "msi(*arg)", but with whether "msi(*arg)" succeeds.
+In the new rule engine, we make this explicit, and write
 
-In the new rule engine, we make this explicit, and write msi(*arg) >= 0 &&
-*arg like "\\*txt" ">=" and "like" have higher priority than "&&".
+````php
+ msi(*arg) >= 0 && *arg like "\*txt"
+````
 
-Now the rule looks like: MyTestRule(*arg) { on(msi(*arg) >= 0 && *arg like
-"\\*txt") { delay("<A></A>") { copyDataObj(*objPath); moveDataObj(*objPath); }
-remote("localhost", "null") { writeLine("stdout", *D); }
+```>=``` and ```like``` have higher priority than ```&&```.
 
-  * A = split("a, b, c", ", ");
-  * B = "*A string"; foreach(*A) { writeLine("serverLog", *A); } } } input *arg="test.txt", *D="string" output ruleExecOut
+Now the rule looks like:
 
-12\. Remove arguments from the main rule
+````php
+ MyTestRule(*arg) {
+     on(msi(*arg) >= 0 && *arg like "\*txt") {
+         delay("<A></A>") { 
+             copyDataObj(*objPath);
+             moveDataObj(*objPath);
+         }
+         remote("localhost", "null") { 
+             writeLine("stdout", *D);
+         }
+         *A = split("a, b, c", ", ");
+         *B = "*A string";
+         foreach(*A) { 
+             writeLine("serverLog", *A);
+         }
+     }
+ }
+ input *arg="test.txt", *D="string"
+ output ruleExecOut
+````
 
-This step only applies to the first rule in an input file to the irule
-command.
+#### 12. Remove arguments from the main rule
 
-In the new rule engine, all the input/output variables are global variables.
-And the first rule is called as the "main" rule in the irule command. The
-"main" rule should not have any parameters. MyTestRule { on(msi(*arg) >= 0 &&
-*arg like "\\*txt") { delay("<A></A>") { copyDataObj(*objPath);
-moveDataObj(*objPath); } remote("localhost", "null") { writeLine("stdout",
-*D); }
+This step only applies to the first rule in an input file to the irule command.
+In the new rule engine, all the input/output variables are global variables. And the first rule is called as the "main" rule in the irule command. The "main" rule should not have any parameters.
 
-  * A = split("a, b, c", ", ");
-  * B = "*A string"; foreach(*A) { writeLine("serverLog", *A); } } } input *arg="test.txt", *D="string" output ruleExecOut
+````php
+ MyTestRule {
+     on(msi(*arg) >= 0 && *arg like "\*txt") {
+         delay("<A></A>") { 
+             copyDataObj(*objPath);
+             moveDataObj(*objPath);
+         }
+         remote("localhost", "null") { 
+             writeLine("stdout", *D);
+         }
+         *A = split("a, b, c", ", ");
+         *B = "*A string";
+         foreach(*A) { 
+             writeLine("serverLog", *A);
+         }
+     }
+ }
+ input *arg="test.txt", *D="string"
+ output ruleExecOut
+````
 
-Now we have a syntactically valid rule for the new rule engine. Make sure to
-save the rule in a ".r" file as the irule command tells whether an input is in
-the new rule engine syntax or the "##" syntax by the file extension.
+Now we have a syntactically valid rule for the new rule engine. Make sure to save the rule in a ".r" file as the irule command tells whether an input is in the new rule engine syntax or the "##" syntax by the file extension.
 
-Other things to consider:
+#### Other things to consider:
 
-  * The "like" expression only supports one type of wildcard "*" (as I do not know of any other wildcards that are being used"), if your rule uses other kinds of wildcard, it can be converted to the regular expression
-  * If you still get a type error, you can try to convert the value to the correct type using one of the following functions: "int", "double", "bool", or "str". For example, if you have an error with
-  * A = 1; msi(*A); and msi expects a string argument, you can do this by msi(str(*A));
-  * If you are using the msiCollectionSpider microservice, the actions have to be quoted, which can be done using "``" [Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine#Quoting Code](Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine#Quoting Code). The variables used in the actions are not accessible outside the actions. This is a result of stricter variables scopes. We will address this issue in future releases.
+The ```like``` expression only supports one type of wildcard "*" (as I do not know of any other wildcards that are being used"), if your rule uses other kinds of wildcard, it can be converted to the regular expression
+If you still get a type error, you can try to convert the value to the correct type using one of the following functions: "int", "double", "bool", or "str". For example, if you have an error with
+
+````php
+  *A = 1;
+  msi(*A);
+````
+
+and msi expects a string argument, you can do this by
+
+````php
+  msi(str(*A));
+````
+
+If you are using the msiCollectionSpider microservice, the actions have to be quoted, which can be done using [Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine#Quoting](https://wiki.irods.org/index.php/Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine#Quoting_Code) Code. The variables used in the actions are not accessible outside the actions. This is a result of stricter variables scopes. We will address this issue in future releases.
 
 ## Language Integrated General Query
 
