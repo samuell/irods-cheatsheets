@@ -1234,11 +1234,11 @@ where
 ````
 where the optional
 * ```input``` indicates that this is an io parameter
-** ```output``` indicates that this is an output parameter
-** ```dynamic``` indicates that this is an io parameter or output parameter determined dynamically
-** ```actions``` indicates that this is a sequence of actions
-** ```expression``` indicates that this is an expression
-** ```f``` indicates that a coercion can be inserted at compile time based on the coercion relation
+    - ```output``` indicates that this is an output parameter
+    - ```dynamic``` indicates that this is an io parameter or output parameter determined dynamically
+    - ```actions``` indicates that this is a sequence of actions
+    - ```expression``` indicates that this is an expression
+    - ```f``` indicates that a coercion can be inserted at compile time based on the coercion relation
 * the ```<quanti>``` are quantifiers of the form
 ````php
   <quanti> ::= forall <tvar> [in {<btype> … <btype>}]
