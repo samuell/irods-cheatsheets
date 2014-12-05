@@ -123,14 +123,14 @@ Arithmetic operators include, ordered by precedence:
 Arithmetic functions include:
 
   ````php
- exp(<num>)
- log(<num>)
- abs(<num>)
- floor(<num>)
- ceiling(<num>)
- average(<num>,<num>,...)
- max(<num>,<num>,...)
- min(<num>,<num>,...)
+exp(<num>)
+log(<num>)
+abs(<num>)
+floor(<num>)
+ceiling(<num>)
+average(<num>,<num>,...)
+max(<num>,<num>,...)
+min(<num>,<num>,...)
 ````
 
 For example:
@@ -389,7 +389,7 @@ writeLine(\"stdout\", \*A)
 or
 
 ````php
- *A like regex "a\*c\\\\\\[\\]" # matches the regular expression a*c\\\[\]
+*A like regex "a\*c\\\\\\[\\]" # matches the regular expression a*c\\\[\]
 ````
 
 In this case you can use "``" instead of the regular quotes. The rule
@@ -770,9 +770,9 @@ data nat =
 Here the type name defined is “nat.” The type parameter list is empty. If the type parameter list is empty, we may omit it. There are two data constructors. The first constructor “zero” has type “nat,” which means that “zero” is a nullary constructor of nat. We use “zero” to represent “0”. The second constructor “succ” has type “nat -> nat” which means that “succ” is unary constructor of nat. We use “succ” to represent the successor. With these two constructors we can represent all natural numbers: ```zero, succ(zero), succ(succ(zero)), ...``` As another example, we can define a data type that represents binary trees of natural numbers
 
 ````php
-  data tree =
-      | empty : tree
-      | node : nat * tree * tree -> tree
+data tree =
+    | empty : tree
+    | node : nat * tree * tree -> tree
 ````
   
 The ```empty``` constructor constructs an empty tree, and the ```node``` constructor
@@ -820,11 +820,13 @@ There are a few restrictions. First, only data constructors and free variables m
 patterns. Second, each variable only occurs once in a pattern (sometimes
 called linearity). To retrieve the components of ```*A```, we can use patterns on
 the left hand side of an assignment. For example
+
 ````php
 pair(*X, *Y) = *A;
 ````
 When this action is executed, ```*X``` will be assigned to 1 and ```*Y``` will be assigned to ```2```.
 Patterns can be combined with let expressions. For example
+
 ````php
 fib(*n) = if *n==0 then pair(-1, 0)
     else if *n==1 then (0, 1)
@@ -840,16 +842,20 @@ constructors are like data constructors but can only be used in patterns.
 Pseudo data constructor definitions are like function definitions except that
 a pseudo data constructor definition starts with a tilde and must return a
 tuple. The general syntax is 
+
 ````php
 <name>(<param>, ..., <param>) = <expr>
 ````
+
 A pseudo data constructor can be thought of an inverse function that maps the values in
 the codomain to values in the domain. For example, we can define the following
 pseudo data constructor
+
 ````php
 lowerdigits(*n) = let *a = *n % 10 in ((*n - *a) / 10 % 10, *a)
 ````
 The assignment
+
 ````php
 lowerdigits(*a, *b) = 256;
 ````
@@ -867,12 +873,12 @@ supports a more general notion of an action recovery block. An action recovery
 block has the form 
 
 ````php
-  {
-     A1 ::: R1
-     A2 ::: R2
-     ...
-     An ::: Rn
-  }
+{
+   A1 ::: R1
+   A2 ::: R2
+   ...
+   An ::: Rn
+}
 ````
 
 The basic semantics is that if ```Ax``` fails then ```Rx, R(x-1), ... R1```` will be executed. The programmer
@@ -910,11 +916,13 @@ another way of using if, which will be referred to as the "functional if". The
 "functional if" may return a value of any type if it succeeds. The two
 different usages have different syntax. The "logical if" has the same syntax
 as before
+
 ````php
 if <expr> then { <actions> } else { <actions> }
 ````
 
 while the "functional if" has the following syntax
+
 ````php
 if <expr> then <expr> else <expr>
 ````
@@ -1041,10 +1049,10 @@ R1##R2##...##Rn
 
 Rulegen syntax: 
 ````php
-  A1:::R1
-  A2:::R2
-  ...
-  An:::Rn
+A1:::R1
+A2:::R2
+...
+An:::Rn
 ````
 
 If Ax fails, then ```Rx, ..., R1``` are executed
@@ -1086,8 +1094,8 @@ executed.
 
 Action: 
 ````php
-  while(cond, A1##A2##...##An
-              R1##R2##...##Rn)
+while(cond, A1##A2##...##An
+            R1##R2##...##Rn)
 ````
 Recovery:
 ````php
@@ -1096,12 +1104,12 @@ R
 
 Rulegen syntax: 
 ````php
-  while(cond) {
-      A1:::R1
-      A2:::R2
-      ...
-      An:::Rn
-  }:::R
+while(cond) {
+    A1:::R1
+    A2:::R2
+    ...
+    An:::Rn
+}:::R
 ````
 
 If ```Ax``` fails, then ```Rx, ..., R1, R``` are executed. If ```cond``` fails, then ```R``` is
@@ -1206,20 +1214,20 @@ existing iRODS types by viewing the existing iRODS types as opaque types.
 
 The function parameter and return types can be
 ````php
-  <btype> ::= boolean
-            | integer
-            | double
-            | string
-            | time
-            | path
+<btype> ::= boolean
+          | integer
+          | double
+          | string
+          | time
+          | path
 ````
 ````php
-  <stype> ::= <tvar>                   identifiers starting with uppercase letters
-            | iRODS types              back quoted string
-            | <btype>
-            | ?                        dynamic type
-            | <stype> * … * <stype>    tuple types 
-            | c[(<stype>, …, <stype>)] inductive data types
+<stype> ::= <tvar>                   identifiers starting with uppercase letters
+          | iRODS types              back quoted string
+          | <btype>
+          | ?                        dynamic type
+          | <stype> * … * <stype>    tuple types 
+          | c[(<stype>, …, <stype>)] inductive data types
 ````
 A function type is
 ````php
@@ -1327,10 +1335,10 @@ As in C, all variables in the rule language have a fixed type that can not be up
 For example, the following does not work:
 
 ````php
-  testTyping1 {
-      *A = 1;
-      *A = "str";
-  }
+testTyping1 {
+    *A = 1;
+    *A = "str";
+}
 ````
 
 Once a variable ```*A``` is assigned a value ```X``` the type of the variable is given by a typing constraint
@@ -1486,10 +1494,10 @@ There error messages can be found in the server log.
 To improve the performance of rule execution, the new rule engine provide two level indexing on applicable rules. The first level of indexing is based on the rule name. The second level of indexing is based on rule conditions. The rule condition indexing can be demonstrate by the following example:
   
 ````php
-  testRule(*A) {
-      on (*A == "a") { ... }
-      on (*A == "b") { ... }
-  }
+testRule(*A) {
+    on (*A == "a") { ... }
+    on (*A == "b") { ... }
+}
 ````
 
 In this example, we have two rules with the same rule name, but different rule conditions. The first level of indexing does not improve the performance in a rule application like
@@ -1530,14 +1538,14 @@ delayed execution or remote execution.
 The new rule engine has backward compatible modes that allow it to run rules written for the old rule engine in the "##" syntax and a less strict grammar with little or no change. The backward compatible mode can be set to "true", "false", or "auto" using the @backwardCompatible directive. For example
 
 ````php
- @backwardCompatible "true"
- acPostProcForPut|$objPath like *.txt|writeLine(serverLog, text: $objPath)|nop
- @backwardCompatible "false"
- acPostProcForPut {
-     on($objPath like "*.html") {
-         writeLine("serverLog", "html: $objPath");
-     }
- }
+@backwardCompatible "true"
+acPostProcForPut|$objPath like *.txt|writeLine(serverLog, text: $objPath)|nop
+@backwardCompatible "false"
+acPostProcForPut {
+   on($objPath like "*.html") {
+       writeLine("serverLog", "html: $objPath");
+   }
+}
 ````
 
 As shown in the example, backward compatible modes can be mixed within one code base. By default the backward compatible mode is set to ```auto```. In the ```auto``` mode, the rule engine tries to detect whether the code is written in the ```##``` syntax or the newer grammar and automatically apply backward compatibility to the ```##``` syntax.
@@ -1545,24 +1553,24 @@ As shown in the example, backward compatible modes can be mixed within one code 
 For example, the example can be written as:
 
 ````php
- @backwardCompatible "auto"
- acPostProcForPut|$objPath like *.txt|writeLine(serverLog, text: $objPath)|nop
- acPostProcForPut {
-     on($objPath like "*.html") {
-         writeLine("serverLog", "html: $objPath");
-     }
- }
+@backwardCompatible "auto"
+acPostProcForPut|$objPath like *.txt|writeLine(serverLog, text: $objPath)|nop
+acPostProcForPut {
+   on($objPath like "*.html") {
+       writeLine("serverLog", "html: $objPath");
+   }
+}
 ````
 
 or if you use the default setting,
 
 ````php
- acPostProcForPut|$objPath like *.txt|writeLine(serverLog, text: $objPath)|nop
- acPostProcForPut {
-     on($objPath like "*.html") {
-         writeLine("serverLog", "html: $objPath");
-     }
- }
+acPostProcForPut|$objPath like *.txt|writeLine(serverLog, text: $objPath)|nop
+acPostProcForPut {
+   on($objPath like "*.html") {
+       writeLine("serverLog", "html: $objPath");
+   }
+}
 ````````
 
 ### Backward Incompatibilities
@@ -1590,7 +1598,7 @@ The ```\``` character escapes the ```*``` character following it and turns it fr
 In the old rule engine, the following code iterates over a comma separated string:
 
 ````php
- rule||assign(*A, "x, y, z")##forEachExec(*A, writeLine(stdout, *A), nop)|nop
+rule||assign(*A, "x, y, z")##forEachExec(*A, writeLine(stdout, *A), nop)|nop
 ````
 
 The new rule engine generates an error when running this code. This rule can be implemented as:
@@ -1650,9 +1658,9 @@ rule {
 The old rule engine allows the input parameters to be either an unquoted string or an expression:
 
 ````php
- testrule||writeLine(stdout, *A *D)|nop
- *A=unquoted string%*D=0 + 1
- ruleExecOut
+testrule||writeLine(stdout, *A *D)|nop
+*A=unquoted string%*D=0 + 1
+ruleExecOut
 ````
 
 While the old rule engine returns
@@ -1701,19 +1709,19 @@ However, rules written in the rulegen syntax have to be preprocessed using the r
 The biggest one is to eliminate ambiguities in corner cases, which we illustrate by the following examples. Suppose that if the content of ```*A`` is a string ```"0 + 1"```, should the following expression evaluate to true or false?
 
 ````php
- *A == 0 + 1
+*A == 0 + 1
 ````
 
 This ambiguity has its root in the ambiguity whether ```"0 + 1"``` on the right hand side of the comparison is a string or an integer expression. Instead of adding exceptions to existing grammatical rules, we chose instead to streamline and simplify the rule, as other mainstream programming languages do, by requiring strings to be quoted, so that
 
 ````php
- *A == "0 + 1"
+*A == "0 + 1"
 ````
 
 compares the content of *A with the string "0 + 1", and
 
 ````php
- *A == 0 + 1
+*A == 0 + 1
 ````
 compares the content of ```*A``` with the integer expression ```0 + 1```.
 
@@ -1737,68 +1745,68 @@ Next, we convert this rule into the new rule engine syntax. If a step is written
 This step is optional.
 
 ````php
- My Test Rule(*arg)
-     |msi(*arg) && *arg like *txt|
-         delayExec(<A></A>, 
-             copyDataObj(*objPath)##
-             moveDataObj(*objPath), 
-             nop##nop)##
-         remoteExec(localhost, null, 
-             writeLine(stdout, *D), 
-             nop)##
-         assign(*A, "a, b, c")##
-         assign(*B, *A string)##
-         forEachExec(*A, 
-             writeLine(serverLog, *A), 
-             nop)|nop
- *obj=test.txt%*D=string
- ruleExecOut
+My Test Rule(*arg)
+   |msi(*arg) && *arg like *txt|
+       delayExec(<A></A>, 
+           copyDataObj(*objPath)##
+           moveDataObj(*objPath), 
+           nop##nop)##
+       remoteExec(localhost, null, 
+           writeLine(stdout, *D), 
+           nop)##
+       assign(*A, "a, b, c")##
+       assign(*B, *A string)##
+       forEachExec(*A, 
+           writeLine(serverLog, *A), 
+           nop)|nop
+*obj=test.txt%*D=string
+ruleExecOut
 ````
 
 #### 2. Convert "|"s to rulegen syntax 
 
 ````php
- My Test Rule(*arg) {
-     on(msi(*arg) && *arg like *txt) {
-         delayExec(<A></A>, 
-             copyDataObj(*objPath)##
-             moveDataObj(*objPath), 
-             nop##nop)##
-         remoteExec(localhost, null, 
-             writeLine(stdout, *D), 
-             nop)##
-         assign(*A, "a, b, c")##
-         assign(*B, *A string)##
-         forEachExec(*A, 
-             writeLine(serverLog, *A), 
-             nop)
-     }
- }
- *obj=test.txt%*D=string
- ruleExecOut
+My Test Rule(*arg) {
+   on(msi(*arg) && *arg like *txt) {
+       delayExec(<A></A>, 
+           copyDataObj(*objPath)##
+           moveDataObj(*objPath), 
+           nop##nop)##
+       remoteExec(localhost, null, 
+           writeLine(stdout, *D), 
+           nop)##
+       assign(*A, "a, b, c")##
+       assign(*B, *A string)##
+       forEachExec(*A, 
+           writeLine(serverLog, *A), 
+           nop)
+   }
+}
+*obj=test.txt%*D=string
+ruleExecOut
 ````
  
 #### 3. Convert "##"s to ";" 
 
 ````php
- My Test Rule(*arg) {
-     on(msi(*arg) && *arg like *txt) {
-         delayExec(<A></A>, 
-             copyDataObj(*objPath);
-             moveDataObj(*objPath), 
-             nop;nop);
-         remoteExec(localhost, null, 
-             writeLine(stdout, *D), 
-             nop);
-         assign(*A, "a, b, c");
-         assign(*B, *A string);
-         forEachExec(*A, 
-             writeLine(serverLog, *A), 
-             nop)
-     }
- }
- *obj=test.txt%*D=string
- ruleExecOut
+My Test Rule(*arg) {
+   on(msi(*arg) && *arg like *txt) {
+       delayExec(<A></A>, 
+           copyDataObj(*objPath);
+           moveDataObj(*objPath), 
+           nop;nop);
+       remoteExec(localhost, null, 
+           writeLine(stdout, *D), 
+           nop);
+       assign(*A, "a, b, c");
+       assign(*B, *A string);
+       forEachExec(*A, 
+           writeLine(serverLog, *A), 
+           nop)
+   }
+}
+*obj=test.txt%*D=string
+ruleExecOut
 ````
  
 #### 4. Convert delayExec, remoteExec, assign, forEachExec, etc. to rulegen syntax
@@ -1806,47 +1814,47 @@ This step is optional.
 In this step, you can add or remove ";"s to make it follow the C conventions.
 
 ````php
- My Test Rule(*arg) {
-     on(msi(*arg) && *arg like *txt) {
-         delay(<A></A>) { 
-             copyDataObj(*objPath):::nop;
-             moveDataObj(*objPath):::nop;
-         }
-         remote(localhost, null) { 
-             writeLine(stdout, *D):::nop;
-         }
-         *A = "a, b, c";
-         *B = *A string;
-         foreach(*A) { 
-             writeLine(serverLog, *A):::nop;
-         }
-     }
- }
- *obj=test.txt%*D=string
- ruleExecOut
+My Test Rule(*arg) {
+   on(msi(*arg) && *arg like *txt) {
+       delay(<A></A>) { 
+           copyDataObj(*objPath):::nop;
+           moveDataObj(*objPath):::nop;
+       }
+       remote(localhost, null) { 
+           writeLine(stdout, *D):::nop;
+       }
+       *A = "a, b, c";
+       *B = *A string;
+       foreach(*A) { 
+           writeLine(serverLog, *A):::nop;
+       }
+   }
+}
+*obj=test.txt%*D=string
+ruleExecOut
 ````
  
 #### 5. Convert input and output to rulegen syntax
 
 ````php
- My Test Rule(*arg) {
-     on(msi(*arg) && *arg like *txt) {
-         delay(<A></A>) { 
-             copyDataObj(*objPath):::nop;
-             moveDataObj(*objPath):::nop;
-         }
-         remote(localhost, null) { 
-             writeLine(stdout, *D):::nop;
-         }
-         *A = "a, b, c";
-         *B = *A string;
-         foreach(*A) { 
-             writeLine(serverLog, *A):::nop;
-         }
-     }
- }
- input *obj=test.txt, *D=string
- output ruleExecOut
+My Test Rule(*arg) {
+   on(msi(*arg) && *arg like *txt) {
+       delay(<A></A>) { 
+           copyDataObj(*objPath):::nop;
+           moveDataObj(*objPath):::nop;
+       }
+       remote(localhost, null) { 
+           writeLine(stdout, *D):::nop;
+       }
+       *A = "a, b, c";
+       *B = *A string;
+       foreach(*A) { 
+           writeLine(serverLog, *A):::nop;
+       }
+   }
+}
+input *obj=test.txt, *D=string
+output ruleExecOut
 ````
 
 #### 6. Delete superfluous nops
@@ -1854,24 +1862,24 @@ In this step, you can add or remove ";"s to make it follow the C conventions.
 This step is optional
 
 ````php
- My Test Rule(*arg) {
-     on(msi(*arg) && *arg like *txt) {
-         delay(<A></A>) { 
-             copyDataObj(*objPath);
-             moveDataObj(*objPath);
-         }
-         remote(localhost, null) { 
-             writeLine(stdout, *D);
-         }
-         *A = "a, b, c";
-         *B = *A string;
-         foreach(*A) { 
-             writeLine(serverLog, *A);
-         }
-     }
- }
- input *obj=test.txt, *D=string
- output ruleExecOut
+My Test Rule(*arg) {
+   on(msi(*arg) && *arg like *txt) {
+       delay(<A></A>) { 
+           copyDataObj(*objPath);
+           moveDataObj(*objPath);
+       }
+       remote(localhost, null) { 
+           writeLine(stdout, *D);
+       }
+       *A = "a, b, c";
+       *B = *A string;
+       foreach(*A) { 
+           writeLine(serverLog, *A);
+       }
+   }
+}
+input *obj=test.txt, *D=string
+output ruleExecOut
 ````
 
 ### Rulegen => New Rule Engine
@@ -1887,20 +1895,20 @@ writeLine(serverLog, *A);
 ```serverLog``` is interpreted by the rule engine as a microservice/rule because it is not quoted. The rule engine will try to execute that microservice/rule and will pass the return value in as the argument. To pass "serverLog" as the argument, it has to be quoted.
 
 ````php
- writeLine("serverLog", *A);
+writeLine("serverLog", *A);
 ````
 
 Similarly, the arguments to remote and delay are also strings. So, they need to be quoted.
 On the right hand side of an assign statement, we also need to quote the string. If the right hand side is an expression we don't quote it. For example
 
 ````php
- *A = "0 + 1"
+*A = "0 + 1"
 ````
 
 assigns the string ```"0 + 1"``` to ```*A```, and
 
 ````php
- *A = 0 + 1
+*A = 0 + 1
 ````
 
 assigns ```1``` to ```*A```
@@ -1910,24 +1918,24 @@ The input parameters are also strings, and we need to quote them.
 The rule now looks like:
 
 ````php
- My Test Rule(*arg) {
-     on(msi(*arg) && *arg like "*txt") {
-         delay("<A></A>") { 
-             copyDataObj(*objPath);
-             moveDataObj(*objPath);
-         }
-         remote("localhost", "null") { 
-             writeLine("stdout", *D);
-         }
-         *A = "a, b, c";
-         *B = "*A string";
-         foreach(*A) { 
-             writeLine("serverLog", *A);
-         }
-     }
- }
- input *arg="test.txt", *D="string"
- output ruleExecOut
+My Test Rule(*arg) {
+   on(msi(*arg) && *arg like "*txt") {
+       delay("<A></A>") { 
+           copyDataObj(*objPath);
+           moveDataObj(*objPath);
+       }
+       remote("localhost", "null") { 
+           writeLine("stdout", *D);
+       }
+       *A = "a, b, c";
+       *B = "*A string";
+       foreach(*A) { 
+           writeLine("serverLog", *A);
+       }
+   }
+}
+input *arg="test.txt", *D="string"
+output ruleExecOut
 ````
  
 #### 8. Escape special characters in strings
@@ -1940,24 +1948,24 @@ Special character such as ```*``` may be interpreted by the rule engine even in 
 ```*txt``` is considered a variable which is expanded into the string. However, what we intended to do is to use ```*txt``` as a pattern. Therefore the ```*``` should not be interpreted by the rule engine. To do this we convert it to ```\*txt```. Details on special characters can be found in the Strings section
 
 ````php
- My Test Rule(*arg) {
-     on(msi(*arg) && *arg like "\*txt") {
-         delay("<A></A>") { 
-             copyDataObj(*objPath);
-             moveDataObj(*objPath);
-         }
-         remote("localhost", "null") { 
-             writeLine("stdout", *D);
-         }
-         *A = "a, b, c";
-         *B = "*A string";
-         foreach(*A) { 
-             writeLine("serverLog", *A);
-         }
-     }
- }
- input *arg="test.txt", *D="string"
- output ruleExecOut
+My Test Rule(*arg) {
+   on(msi(*arg) && *arg like "\*txt") {
+       delay("<A></A>") { 
+           copyDataObj(*objPath);
+           moveDataObj(*objPath);
+       }
+       remote("localhost", "null") { 
+           writeLine("stdout", *D);
+       }
+       *A = "a, b, c";
+       *B = "*A string";
+       foreach(*A) { 
+           writeLine("serverLog", *A);
+       }
+   }
+}
+input *arg="test.txt", *D="string"
+output ruleExecOut
 ````
  
 9. Delete white spaces in rule names.
@@ -1965,61 +1973,61 @@ Special character such as ```*``` may be interpreted by the rule engine even in 
 Rule names must be valid identifiers generated from the following regular expression
 
 ````php
- <letter> (<letter>|<digit>)*
+<letter> (<letter>|<digit>)*
 ````
 
 where
 
 ````php
- <letter> ::= a|...|z|A|...|Z
- <digit>  ::= 0|...|9
+<letter> ::= a|...|z|A|...|Z
+<digit>  ::= 0|...|9
 ````
  
 Now, the rule looks like:
  
 ````php
- MyTestRule(*arg) {
-     on(msi(*arg) && *arg like "\*txt") {
-         delay("<A></A>") { 
-             copyDataObj(*objPath);
-             moveDataObj(*objPath);
-         }
-         remote("localhost", "null") { 
-             writeLine("stdout", *D);
-         }
-         *A = "a, b, c";
-         *B = "*A string";
-         foreach(*A) { 
-             writeLine("serverLog", *A);
-         }
-     }
- }
- input *arg="test.txt", *D="string"
- output ruleExecOut
+MyTestRule(*arg) {
+   on(msi(*arg) && *arg like "\*txt") {
+       delay("<A></A>") { 
+           copyDataObj(*objPath);
+           moveDataObj(*objPath);
+       }
+       remote("localhost", "null") { 
+           writeLine("stdout", *D);
+       }
+       *A = "a, b, c";
+       *B = "*A string";
+       foreach(*A) { 
+           writeLine("serverLog", *A);
+       }
+   }
+}
+input *arg="test.txt", *D="string"
+output ruleExecOut
 ````
  
 10. Use split to split the string if it is used as a collection in foreach
 In the new rule engine, ```foreach``` requires the parameter to be a list or iRODS type ```GenQueryOut_PI```. The case where it is a comma separated string can be simulated using the split function:
 
 ````php
- MyTestRule(*arg) {
-     on(msi(*arg) && *arg like "\*txt") {
-         delay("<A></A>") { 
-             copyDataObj(*objPath);
-             moveDataObj(*objPath);
-         }
-         remote("localhost", "null") { 
-             writeLine("stdout", *D);
-         }
-         *A = split("a, b, c", ", ");
-         *B = "*A string";
-         foreach(*A) { 
-             writeLine("serverLog", *A);
-         }
-     }
- }
- input *arg="test.txt", *D="string"
- output ruleExecOut
+MyTestRule(*arg) {
+   on(msi(*arg) && *arg like "\*txt") {
+       delay("<A></A>") { 
+           copyDataObj(*objPath);
+           moveDataObj(*objPath);
+       }
+       remote("localhost", "null") { 
+           writeLine("stdout", *D);
+       }
+       *A = split("a, b, c", ", ");
+       *B = "*A string";
+       foreach(*A) { 
+           writeLine("serverLog", *A);
+       }
+   }
+}
+input *arg="test.txt", *D="string"
+output ruleExecOut
 ````
 
 #### 11. Convert microservice calls in rule conditions
@@ -2041,7 +2049,7 @@ we are not trying to compute the "logical and" with the return code of ```msi(*a
 In the new rule engine, we make this explicit, and write
 
 ````php
- msi(*arg) >= 0 && *arg like "\*txt"
+msi(*arg) >= 0 && *arg like "\*txt"
 ````
 
 ```>=``` and ```like``` have higher priority than ```&&```.
@@ -2049,24 +2057,24 @@ In the new rule engine, we make this explicit, and write
 Now the rule looks like:
 
 ````php
- MyTestRule(*arg) {
-     on(msi(*arg) >= 0 && *arg like "\*txt") {
-         delay("<A></A>") { 
-             copyDataObj(*objPath);
-             moveDataObj(*objPath);
-         }
-         remote("localhost", "null") { 
-             writeLine("stdout", *D);
-         }
-         *A = split("a, b, c", ", ");
-         *B = "*A string";
-         foreach(*A) { 
-             writeLine("serverLog", *A);
-         }
-     }
- }
- input *arg="test.txt", *D="string"
- output ruleExecOut
+MyTestRule(*arg) {
+   on(msi(*arg) >= 0 && *arg like "\*txt") {
+       delay("<A></A>") { 
+           copyDataObj(*objPath);
+           moveDataObj(*objPath);
+       }
+       remote("localhost", "null") { 
+           writeLine("stdout", *D);
+       }
+       *A = split("a, b, c", ", ");
+       *B = "*A string";
+       foreach(*A) { 
+           writeLine("serverLog", *A);
+       }
+   }
+}
+input *arg="test.txt", *D="string"
+output ruleExecOut
 ````
 
 #### 12. Remove arguments from the main rule
@@ -2075,24 +2083,24 @@ This step only applies to the first rule in an input file to the irule command.
 In the new rule engine, all the input/output variables are global variables. And the first rule is called as the "main" rule in the irule command. The "main" rule should not have any parameters.
 
 ````php
- MyTestRule {
-     on(msi(*arg) >= 0 && *arg like "\*txt") {
-         delay("<A></A>") { 
-             copyDataObj(*objPath);
-             moveDataObj(*objPath);
-         }
-         remote("localhost", "null") { 
-             writeLine("stdout", *D);
-         }
-         *A = split("a, b, c", ", ");
-         *B = "*A string";
-         foreach(*A) { 
-             writeLine("serverLog", *A);
-         }
-     }
- }
- input *arg="test.txt", *D="string"
- output ruleExecOut
+MyTestRule {
+   on(msi(*arg) >= 0 && *arg like "\*txt") {
+       delay("<A></A>") { 
+           copyDataObj(*objPath);
+           moveDataObj(*objPath);
+       }
+       remote("localhost", "null") { 
+           writeLine("stdout", *D);
+       }
+       *A = split("a, b, c", ", ");
+       *B = "*A string";
+       foreach(*A) { 
+           writeLine("serverLog", *A);
+       }
+   }
+}
+input *arg="test.txt", *D="string"
+output ruleExecOut
 ````
 
 Now we have a syntactically valid rule for the new rule engine. Make sure to save the rule in a ".r" file as the irule command tells whether an input is in the new rule engine syntax or the "##" syntax by the file extension.
@@ -2103,14 +2111,14 @@ The ```like``` expression only supports one type of wildcard ```*``` (as I do no
 If you still get a type error, you can try to convert the value to the correct type using one of the following functions: ```int```, ```double```, ```bool```, or ```str```. For example, if you have an error with
 
 ````php
-  *A = 1;
-  msi(*A);
+*A = 1;
+msi(*A);
 ````
 
 and msi expects a string argument, you can do this by
 
 ````php
-  msi(str(*A));
+msi(str(*A));
 ````
 
 If you are using the msiCollectionSpider microservice, the actions have to be quoted, which can be done using [Quoting](https://wiki.irods.org/index.php/Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine#Quoting_Code) Code. The variables used in the actions are not accessible outside the actions. This is a result of stricter variables scopes. We will address this issue in future releases.
@@ -2184,7 +2192,7 @@ In addition to the characters that must be escaped in a string, the following ch
 A path literal can be assigned to a variable:
 
 ````php
-  *H = /tempZone/home/rods
+*H = /tempZone/home/rods
 ````
 
 New path literals can be constructed from paths but it must start with "/", the rule engine automatically removes redundant leading slashes in a path:
@@ -2196,14 +2204,14 @@ New path literals can be constructed from paths but it must start with "/", the 
 Path literals can be used in various places. If a path literal points to a collection, it can be used in a foreach loop to loop over all data objects under that collection.
 
 ````php
-  foreach(*D in *H) {
-      ...
-  }
+foreach(*D in *H) {
+  ...
+}
 ````
 
 A path literal can also be used in collection and data object related microservice calls:
 
 ````php
-  msiCollCreate(/*H/newColl, "", *Status);
-  msiRmColl(/*H/newColl, "", *Status);
+msiCollCreate(/*H/newColl, "", *Status);
+msiRmColl(/*H/newColl, "", *Status);
 ````
