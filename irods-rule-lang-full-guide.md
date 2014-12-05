@@ -864,10 +864,19 @@ a rule definition may have a recovery action. The recovery action is executed
 when the action fails. This allows iRODS rules to rollback some side effects
 and restore most of the system state to a previous point. The new rule engine
 supports a more general notion of an action recovery block. An action recovery
-block has the form { A1 ::: R1 A2 ::: R2 ... An ::: Rn } The basic semantics
-is that if Ax fails then Rx, R(x-1), ... R1 will be executed. The programmer
-can use this mechanism to restore the system state to the point before this
-action recovery block is executed.
+block has the form 
+
+````php
+  {
+     A1 ::: R1
+     A2 ::: R2
+     ...
+     An ::: Rn
+  }
+````
+
+The basic semantics is that if ```Ax``` fails then ```Rx, R(x-1), ... R1```` will be executed. The programmer
+can use this mechanism to restore the system state to the point before this action recovery block is executed.
 
 The new rule engine make the distinction between expressions and actions. An
 expression does not have a recovery action. An action always has a recovery
@@ -875,7 +884,7 @@ action. If a recovery action is not specified for an action, the rule engine
 use "nop" as the default recovery action.
 
 Examples of expressions include the rule condition, and the conditional
-expressions in the "if", "while", and "for" actions.
+expressions in the ```if```, ```while```, and ```for``` actions.
 
 There is no intrinsic difference between an action and an expression. An
 expression becomes an action when it occurs at an action position in an action
@@ -889,7 +898,7 @@ base.
 From this perspective, the only difference between functions and rules is
 nondeterminism.
 
-### "if"
+### if
 
 The new rule engine has a few useful extensions to the "if" keyword that makes
 programming in the rule language more convenient.
@@ -900,37 +909,76 @@ either succeeds or fails with an error code, the new rule engine supports
 another way of using if, which will be referred to as the "functional if". The
 "functional if" may return a value of any type if it succeeds. The two
 different usages have different syntax. The "logical if" has the same syntax
-as before, if <expr> then { <actions> } else { <actions> }
+as before
+````php
+if <expr> then { <actions> } else { <actions> }
+````
 
-while the "functional if" has the following syntax. if <expr> then <expr> else
-<expr>
+while the "functional if" has the following syntax
+````php
+if <expr> then <expr> else <expr>
+````
 
-For example, the following are "functional if"s if true then 1 else 0 if *A==1
-then true else false To compare, if written in the "logical if" form, the
-second example would be if (*A==1) then { true; } else { false; }
+For example, the following are "functional if"s
+````php
+if true then 1 else 0 
+if *A==1 then true else false 
+````
+To compare, if written in the "logical if" form, the
+second example would be
+````php
+if (*A==1) then { true; } else { false; }
+````
 
 To make the syntax of "logical if" more concise, the new rule engine allows
-the following abbreviation (where the greyed out part can be abbreviated): if
-(...) <span style="color:gray">then</span> { ... } else { ... } if (...) then
-{ ... } else <span style="color:gray">{</span> if (...) then {...} else {...}
-<span style="color:gray">}</span> Multiple abbreviations can be combined for
-example: if (*X==1) { *A = "Mon"; } else if (*X==2) {*A = "Tue"; } else if
-(*X==3) {*A = "Wed"; } ...
+the following abbreviation (where the greyed out part can be abbreviated): 
+````php
+if (...) then { ... } else { ... } 
+if (...) then { ... } else { if (...) then {...} else {...} }
+````
+Multiple abbreviations can be combined for
+example:
+````php
+if (*X==1) { *A = "Mon"; } 
+else if (*X==2) {*A = "Tue"; } 
+else if (*X==3) {*A = "Wed"; } 
+...
+````
 
-### "foreach"
+### foreach
 
 The new rule engine allows defining a different variable name for the iterator
-variables in the foreach action. For example, foreach(*E in *C) {
-writeLine("stdout", *E); } This is equivalent to foreach(*C) {
-writeLine("stdout", *C); }
+variables in the foreach action. For example
+````php
+foreach(*E in *C) {
+  writeLine("stdout", *E); 
+} 
+````
+This is equivalent to
+````php
+foreach(*C) {
+  writeLine("stdout", *C); 
+}
+````
 
 This new feature allows the collection to be a complex expression. For
-example, foreach(*E in list("This", "is", "a", "list")) { writeLine("stdout",
-*E); } This is equivalent to
+example
 
-  * C = list("This", "is", "a", "list"); foreach(*C) { writeLine("stdout", *C); }
+````php
+foreach(*E in list("This", "is", "a", "list")) { 
+  writeLine("stdout", *E); 
+} 
+````
+This is equivalent to
 
-### The "let" Expression
+````php
+*C = list("This", "is", "a", "list");
+foreach(*C) {
+   writeLine("stdout", *C);
+}
+````
+
+### The ```let``` Expression
 
 As function definitions are based on expressions rather than action sequences,
 we cannot put an assignment directly inside an expression. For example, the
