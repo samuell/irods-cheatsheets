@@ -485,12 +485,16 @@ it returns ```NOT CONSTANT```.
 
 The new rule engine expands variables on demand, like in C, instead of
 expanding variables before a rule is executed. For example, suppose we have
-the following rule ifExec(*A==1,assign(*A,0),assign(*A,1),nop,nop) Expanding
-*A (say, to 1) before the rule is executed would result in something like
-ifExec(1==1,assign(1,0),assign(1,1),nop,nop) As a result, extra code has to be
-written for system microservices to avoid this. With the new rule engine, the
-value of *A is retrieved from a runtime environment only when the rule engine
-tries to evaluate it.
+the following rule 
+
+````php
+ifExec(*A==1,assign(*A,0),assign(*A,1),nop,nop) 
+````
+Expanding ```*A``` (say, to 1) before the rule is executed would result in something like
+````php
+ifExec(1==1,assign(1,0),assign(1,1),nop,nop) 
+````
+As a result, extra code has to be written for system microservices to avoid this. With the new rule engine, the value of ```*A`` is retrieved from a runtime environment only when the rule engine tries to evaluate it.
 
 ## Function
 
@@ -498,11 +502,23 @@ tries to evaluate it.
 
 The new rule engine allows defining functions. Functions can be thought of as
 microservices written in the rule language. The syntax of a function
-definition is <name>(<param>, ..., <param>) = <expr> For example, square(*n) =
-*n * *n Function names should be unique (no function-function or function-rule
+definition is 
+
+````php
+<name>(<param>, ..., <param>) = <expr> 
+````
+For example
+````php
+square(*n) = *n * *n 
+````
+Function names should be unique (no function-function or function-rule
 name conflict). Functions can be defined in a mutually exclusive manner. For
-example, odd(*n) = if *n==0 then false else even(*n-1) even(*n) = if *n==1
-then true else odd(*n-1) Here we cannot use && or || because they do not short
+example
+````php
+odd(*n) = if *n==0 then false else 
+even(*n-1) even(*n) = if *n==1 then true else odd(*n-1) 
+````
+Here we cannot use ```&&``` or ```||``` because they do not short
 circuit like in C or Java.
 
 ### Calling a Function
@@ -514,29 +530,43 @@ To use a function, call it as if it was a microservice.
 ### Rule Definition
 
 The syntax of a rule with a nontrivial rule condition is as follows:
-<name>(<param>, ..., <param>) { on(<expr>) { <actions> } }
+````php
+<name>(<param>, ..., <param>) { 
+  on(<expr>) { <actions> } 
+}
+````
 
 If the rule condition is trivial or unnecessary, the rule can be written in
-the simpler form: <name>(<param>, ..., <param>) { <actions> }
-
+the simpler form: 
+````php
+<name>(<param>, ..., <param>) { <actions> }
+````
 Multiple rules with the same rule name and parameters list can be combined in
 a more concise syntax where each set of actions is enumerated for each set of
-conditions: <name>(<param>, ..., <param>) { on(<expr>) { <actions> } ...
-on(<expr>) { <actions> } }
+conditions: 
+````php
+<name>(<param>, ..., <param>) { 
+  on(<expr>) { <actions> } ...
+  on(<expr>) { <actions> } 
+}
+````
 
 ### Function Name and Rule Name
 
 Function and rule names have to be valid identifiers. Identifiers start with
 letters followed by letters or digits. For example,
-ThisIsAValidFunctionNameOrRuleName There should not be whitespaces in a
-function name or a rule name. For example, This Is Not A Valid Function Name
-or Rule Name
+````php
+ThisIsAValidFunctionNameOrRuleName
+````
+There should not be whitespaces in a
+function name or a rule name. For example
+````php
+This Is Not A Valid Function Name or Rule Name
+````
 
 ### Rule Condition
 
-In the new rule engine, rule conditions should be expressions of type boolean.
-The rule is executed only when the rule condition evaluates to true. Which
-means that there are three failure conditions:
+In the new rule engine, rule conditions should be expressions of type ```boolean```. The rule is executed only when the rule condition evaluates to true. Which means that there are three failure conditions:
 
   1. Rule condition evaluates to false.
   2. Some actions in rule condition fails which causes the evaluation of the whole rule condition to fail.
@@ -545,26 +575,61 @@ means that there are three failure conditions:
 For example, if we want to run a rule when the microservice "msi" succeeds, we
 can write the rule as
 
-rule { on (msi >= 0) { ... } } Conversely, if we want to run a rule when the
-microservice fails, we need to write the rule as rule { on (errorcode(msi) <
-0) { ... } } The errormsg microservice captures the error message, allows
+````php
+rule { 
+  on (msi >= 0) { ... } 
+} 
+````
+Conversely, if we want to run a rule when the
+microservice fails, we need to write the rule as 
+````php
+rule { 
+  on (errorcode(msi) < 0) { ... } 
+}
+````
+The errormsg microservice captures the error message, allows
 further processing of the error message, and avoiding the default logging of
-the error message rule { on (errormsg(msi, *msg) < 0) { ... } } By failure
-condition 3, the following rule condition always fails because msi returns an
-integer value on(msi) { ... }
+the error message
+````php
+rule { 
+  on (errormsg(msi, *msg) < 0 ) { ... } 
+} 
+````
+By failure condition 3, the following rule condition always fails because msi returns an integer value 
+````php
+on(msi) { ... }
+````
 
 ### Generating and Capturing Errors
 
 In a rule, we can also prevent the rule from failing when a microservice fails
-errorcode(msi) The errormsg microservice captures the error message, allows
+````php
+errorcode(msi)
+````
+The errormsg microservice captures the error message, allows
 further processing of the error message, and avoiding the default logging of
-the error message errormsg(msi, *msg) In a rule, the fail and failmsg
-microservices can be used to generate errors fail(*errorcode) generates an
-error with an error code failmsg(*errorcode, *errormsg) generates an error
-with an error code and an error message. For example, fail(-1) failmsg(-1,
-"this is a user generated error message")
+the error message
+````php
+errormsg(msi, *msg)
+````
+In a rule, the fail and failmsg microservices can be used to generate errors 
+````php
+fail(*errorcode)
+````
+generates an error with an error code
+````php
+failmsg(*errorcode, *errormsg)
+````
+generates an error with an error code and an error message. For example
+````php
+fail(-1)
+failmsg(-1, "this is a user generated error message")
+````
 
-The msiExit microservice is similar to failmsg. msiExit("-1", "msi")
+The msiExit microservice is similar to failmsg
+````php
+msiExit("-1", "msi")
+````
 
 ### Calling a Rule
 
