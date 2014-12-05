@@ -1111,17 +1111,35 @@ from the loop invariant to before the loop is executed.
 
 #### ```foreach```
 
-Action: foreach(coll, A1##A2##...##An R1##R2##...##Rn) Recovery: R
+Action: 
+````php
+foreach(coll, A1##A2##...##An 
+              R1##R2##...##Rn) 
+````
 
-Rulegen syntax: foreach(coll) { A1:::R1 A2:::R2 ... An:::Rn }:::R If Ax fails,
-then Rx, ..., R1, R are executed.
+Recovery: 
+````php
+R
+````
+
+Rulegen syntax: 
+````php
+foreach(coll) {
+    A1:::R1
+    A2:::R2
+    ...
+    An:::Rn
+}:::R
+````
+
+If ```Ax``` fails, then ```Rx, ..., R1, R``` are executed.
 
 #### "for"
 
 Action:
 ````php
-  for(init, cond, incr, A1##A2##...##An
-                        R1##R2##...##Rn)
+for(init, cond, incr, A1##A2##...##An
+                      R1##R2##...##Rn)
 ````
 Recovery:
 ````php
