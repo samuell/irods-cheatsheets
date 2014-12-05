@@ -118,7 +118,7 @@ writeLine("stdout", split("This is a string.", " "));
 # Output: [This,is,a,string.]
 ````
 
-**Trim left**: ```triml(\*str, \*del)```, which trims from ```*str``` the leftmost ```*del```.
+**Trim left**: ```triml(*str, *del)```, which trims from ```*str``` the leftmost ```*del```.
 ````php
 writeLine("stdout", triml("This is a string.", " "));
 # Output: is a string.
@@ -130,8 +130,60 @@ writeLine("stdout", trimr("This is a string.", " "));
 # Output: This is a
 ````
 
+### Variable expansion
+
+````php
+"This is *x."
+# ... is equivalent to:
+"This is "++str(*x)++"."
+````
+
 ## Type conversions
 
 ### To string
+...TBC...
 
 ### To other types
+...TBC...
+
+## Defining Functions
+...TBC...
+
+## Defining Rules
+...TBC...
+
+## Generating and Capturing Errors
+...TBC...
+
+## Data Types
+...TBC...
+
+### Lists
+...TBC...
+
+### Tupes
+...TBC...
+
+## Pattern Matching
+...TBC...
+
+## Control Structures
+...TBC...
+
+### foreach 
+...TBC...
+
+### let
+...TBC...
+
+### match
+...TBC...
+
+### while
+...TBC...
+
+## Types
+...TBC...
+
+## Microservices
+...TBC...
