@@ -70,8 +70,8 @@ Numeric literals include integral literals and double literals. An integral
 literal does not have a decimal while a double literal does. For example, 
 
 ````php
-1 #
-integer 1.0 # double
+1 # integer 
+1.0 # double
 ````
 
 In the iRODS Rule Language, an integer can be converted to a double. The
@@ -80,8 +80,8 @@ the fractional part is zero. The new rule engine, however, provides two
 functions that can be used to truncate the fractional part of a double:
 ```floor()``` and ```ceiling()```.
 
-Integers and doubles can be converted to booleans using the "bool" function.
-"bool" converts 1 to true and 0 to false.
+Integers and doubles can be converted to booleans using the ```bool()``` function.
+```bool()``` converts ```1``` to ```true``` and ```0``` to ```false```.
 
 ### Arithmetic Operators
 
@@ -134,84 +134,174 @@ min(1,2,3)
 
 One of the main changes to the rule language is quotes and escapes in strings.
 The new rule engine requires by default that every string literal is quoted.
-The quotes can be either matching single quotes 'This is a string.' or double
-quotes "This is a string." If a programmer needs to quote strings containing
-single (double) quotes using single (double) quotes, then the quotes in the
-strings should be escaped using a backslash "\", just as in the C Programming
-Language. For example, writeLine("stdout", "\"\"");
+The quotes can be either matching single quotes ```'This is a string.'``` or double
+quotes 
 
-  1. output "" Single quotes inside double quotes are viewed as regular characters, and vice versa. They can be either escaped or not escaped. For example, writeLine("stdout", "'");
-  2. output ' writeLine("stdout", "\'");
-  3. output ' The rule engine also supports various escaped characters: \n, \r, \t,   
-, \', \", \$, \\* An asterisk should always be escaped if it is a regular
+````php
+"This is a string."`
+``` 
+
+If a programmer needs to quote strings containing single (double) quotes using single (double) quotes, then the quotes in the
+strings should be escaped using a backslash ```"\"```, just as in the C Programming
+Language. For example, 
+
+````php
+writeLine("stdout", "\"\"");
+# output "" 
+````
+
+Single quotes inside double quotes are viewed as regular characters, and vice versa. They can be either escaped or not escaped. For example, 
+
+````php
+writeLine("stdout", "'");
+# output ' 
+````
+
+````php
+writeLine("stdout", "\'");
+output ' 
+````
+
+The rule engine also supports various escaped characters: 
+````php
+\n
+\r
+\t, 
+\'
+\"
+\$
+\*
+````
+
+An asterisk should always be escaped if it is a regular
 character and is followed by letters.
 
 ### Converting Values of Other Types to Strings
 
-The "str" function converts a value of type BOOLEAN, INTEGER, DOUBLE,
-DATETIME, or STRING to string. For example, writeLine("stdout", str(123));
+The ```str()``` function converts a value of type BOOLEAN, INTEGER, DOUBLE,
+DATETIME, or STRING to string. For example
 
-  1. output 123
+````php
+writeLine("stdout", str(123));
+# output 123
+````
 
 In addition
 
+````php
 timestrf(*time, *format)
+````
 
-converts a datetime stored in *time to a string, according to the *format
+converts a datetime stored in ```*time``` to a string, according to the ```*format```
 parameter.
 
+````php
 timestr(*time)
+````
 
-converts a datetime stored in *time to a string, according to the default
+converts a datetime stored in ```*time``` to a string, according to the default
 format.
 
 The default format is
 
+````php
 "%b %d %Y %H:%M:%S"
+````
 
 The format string uses the same directives as the standard C library.
 
 ### Converting Strings to Values of Other Types
 
 String can be converted to values of type BOOLEAN, INTEGER, DOUBLE, DATETIME,
-or STRING. For example, int("123") double("123") bool("true")
+or STRING. For example, 
+
+````php
+int("123")
+double("123")
+bool("true")
+````
 
 In addition
 
+````php
 datetimef(*str, *format)
+````
 
-converts a string stored in *str to a datetime, according to the *format
+converts a string stored in ```*str``` to a datetime, according to the ```*format```
 parameter.
 
+````php
 datetime(*str)
+````
 
-converts a string stored in *str to a datetime, according to the default
+converts a string stored in ```*str``` to a datetime, according to the default
 format. It can also be used to convert an integer or a double to a datetime.
 
 The following are examples of string datetime conversion
 
-datetime(*str) datetimef(*str, "%Y %m %d %H:%M:%S") timestr(*time)
+````php
+datetime(*str)
+datetimef(*str, "%Y %m %d %H:%M:%S")
+timestr(*time)
 timestrf(*time, "%Y %m %d %H:%M:%S")
+````
 
 ### String Functions
 
-The new rule engine supports the infix string concatenation operator "++"
-writeLine("stdout", "This "++" is "++" a string.");
+The new rule engine supports the infix string concatenation operator ```"++"```
 
-  1. output This is a string. infix wildcard expression matching operator "like" writeLine("stdout", "This is a string." like "This is*");
-  2. output true infix regular expression matching operator "like regex" writeLine("stdout", "This is a string." like regex "This.*string[.]");
-  3. output true substring function "substr" writeLine("stdout", substr("This is a string.", 0, 4));
-  4. output This length function "strlen" writeLine("stdout", strlen("This is a string."));
-  5. output 17 split function "split" writeLine("stdout", split("This is a string.", " "));
-  6. output [This,is,a,string.] trim left function "triml(*str, *del)", which trims from *str the leftmost *del writeLine("stdout", triml("This is a string.", " "));
-  7. output is a string. trim right function "trimr(*str, *del)", which trims from *str the rightmost *del writeLine("stdout", trimr("This is a string.", " "));
-  8. output This is a
+````php
+writeLine("stdout", "This "++" is "++" a string.");
+# output This is a string.
+````
+
+**Infix wildcard expression matching operator**: ```like```
+````php
+writeLine("stdout", "This is a string." like "This is*");
+# Output: true
+````
+
+**Infix regular expression matching operator**: ```like regex```
+````php
+writeLine("stdout", "This is a string." like regex "This.*string[.]");
+# Output: true
+````
+
+**Substring**: ```substr()```
+````php
+writeLine("stdout", substr("This is a string.", 0, 4));
+# Output: This
+````
+
+**Length**: ```strlen()```
+````php
+writeLine("stdout", strlen("This is a string."));
+# Output: 17
+````
+
+**Split**: ```split()```
+````php
+writeLine("stdout", split("This is a string.", " "));
+# Output: [This,is,a,string.]
+````
+
+**Trim left**: ```triml(*str, *del)```, which trims from ```*str``` the leftmost ```*del```.
+````php
+writeLine("stdout", triml("This is a string.", " "));
+# Output: is a string.
+````
+
+**Trim right**: ```trimr(*str, *del)```, which trims from ```*str``` the rightmost ```*del```.
+````php
+writeLine("stdout", trimr("This is a string.", " "));
+# Output: This is a
+````
 
 ### Variable Expansion
 
 In a quoted string, an asterisk followed immediately by a variable name
-(without whitespaces) makes an expansion of the variable. For example, "This
-is *x." is equivalent to "This is "++str(*x)++"."
+(without whitespaces) makes an expansion of the variable. For example, ```"This
+is *x."``` is equivalent to ```"This is "++str(*x)++"."```
 
 ### Rules for Quoting Action Arguments
 
@@ -223,21 +313,34 @@ parameter of type string and the argument is not of type string, a type error
 may be thrown. For example,
 
 ````php
-* x = 123; strlen(*x); 
+*x = 123; 
+strlen(*x); 
 ````
 This error can be fixed by either using the "str" function strlen(str(*x)); or putting *x into quotes strlen("*x"); Action names and keywords such as for, while, assign are not arguments. Therefore, they do not have to be quoted.
 
 ### Wildcard and Regular Expression
 
 The new rule engine supports both the wildcard matching operator "like" and a
-new regular expression matching operator "like regex." (It is an operator, not
+new regular expression matching operator ```like regex```. (It is an operator, not
 two separate keywords.) Just as the old rule engine does, the new rule engine
-supports the "*" wildcard. For example, "abcd" like "ab*" In case of ambiguity
-with variable expansion, the "*" has to be escaped. For example, "abcd" like
-"a\\*d" because "a*d" is interpreted as "a"++str(*d)+""
+supports the ```*``` wildcard. For example, 
+
+````php
+"abcd" like "ab*"
+````
+
+In case of ambiguity with variable expansion, the ```*``` has to be escaped. For example
+````php
+"abcd" like "a\\*d"
+````
+because ```"a*d"``` is interpreted as ```"a"++str(*d)+""```
 
 When wildcard is not expressive enough, regular expression matching operator
-can be used. For example, "abcd" like regex "a.c."
+can be used. For example
+
+````php
+"abcd" like regex "a.c."
+````
 
 A regular expression matches the whole string. It follows the syntax of the
 POSIX API.
@@ -246,14 +349,19 @@ POSIX API.
 
 Sometime when you want to pass a string representation of code or regular
 expressions into an action, it is very tedious to escape every special
-character in the string. For example, "writeLine(\"stdout\", \\*A)" or
+character in the string. For example
 
-  * A like regex "a\\*c  
-  
-  
-[  
-]" # matches the regular expression a*c  
-\\[\\] In this case you can use "``" instead of the regular quotes. The rule
+````php
+writeLine(\"stdout\", \*A)
+````
+
+or
+
+````php
+ *A like regex "a\*c\\\\\\[\\]" # matches the regular expression a*c\\\[\] matches the regular expression a*c\\\[\]
+````
+
+In this case you can use "``" instead of the regular quotes. The rule
 engine does not further look for variables, etc. in strings between two "``"s.
 With "``", the examples can be written as: ``writeLine("stdout", *A)`` and
 
