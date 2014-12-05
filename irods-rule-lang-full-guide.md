@@ -1884,7 +1884,7 @@ The general guideline is simple, if some text is not quoted, then it is parsed a
 writeLine(serverLog, *A);
 ````
 
-"serverLog" is interpreted by the rule engine as a microservice/rule because it is not quoted. The rule engine will try to execute that microservice/rule and will pass the return value in as the argument. To pass "serverLog" as the argument, it has to be quoted.
+```serverLog``` is interpreted by the rule engine as a microservice/rule because it is not quoted. The rule engine will try to execute that microservice/rule and will pass the return value in as the argument. To pass "serverLog" as the argument, it has to be quoted.
 
 ````php
  writeLine("serverLog", *A);
@@ -1897,13 +1897,13 @@ On the right hand side of an assign statement, we also need to quote the string.
  *A = "0 + 1"
 ````
 
-assigns the string "0 + 1" to *A, and
+assigns the string ```"0 + 1"``` to ```*A```, and
 
 ````php
  *A = 0 + 1
 ````
 
-assigns 1 to *A
+assigns ```1``` to ```*A```
 
 On the right hand side of the like expression, we need to quote the pattern because it is also a string.
 The input parameters are also strings, and we need to quote them.
@@ -1931,13 +1931,13 @@ The rule now looks like:
 ````
  
 #### 8. Escape special characters in strings
-Special character such as "*" may be interpreted by the rule engine even in quoted strings. For example, in
+Special character such as ```*``` may be interpreted by the rule engine even in quoted strings. For example, in
 
 ````php
 *arg like "*txt"
 ````
 
-```*txt``` is considered a variable which is expanded into the string. However, what we intended to do is to use ```*txt``` as a pattern. Therefore the ```*``` should not be interpreted by the rule engine. To do this we convert it to "\*txt". Details on special characters can be found in Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine#Strings.
+```*txt``` is considered a variable which is expanded into the string. However, what we intended to do is to use ```*txt``` as a pattern. Therefore the ```*``` should not be interpreted by the rule engine. To do this we convert it to ```\*txt```. Details on special characters can be found in the Strings section
 
 ````php
  My Test Rule(*arg) {
@@ -1999,7 +1999,7 @@ Now, the rule looks like:
 ````
  
 10. Use split to split the string if it is used as a collection in foreach
-In the new rule engine, "foreach" requires the parameter to be a list or iRODS type `GenQueryOut_PI`. The case where it is a comma separated string can be simulated using the split function:
+In the new rule engine, ```foreach``` requires the parameter to be a list or iRODS type ```GenQueryOut_PI```. The case where it is a comma separated string can be simulated using the split function:
 
 ````php
  MyTestRule(*arg) {
@@ -2023,19 +2023,21 @@ In the new rule engine, "foreach" requires the parameter to be a list or iRODS t
 ````
 
 #### 11. Convert microservice calls in rule conditions
+
 The micro service call
  
 ````php
 msi(*arg)
 ````
 
-in the rule condition returns an integer, if the integer is >= 0 then the microservice is considered successful; otherwise it is considered failed. Therefore, when we write in the old syntax
+in the rule condition returns an integer, if the integer is ```>= 0``` then the microservice is considered successful; otherwise it is considered failed. Therefore, when we write in the old syntax
 
 ````php
 msi(*arg) && *arg like "\*txt"
 ````
 
-we are not trying to compute the "logical and" with the return code of "msi(*arg)", but with whether "msi(*arg)" succeeds.
+we are not trying to compute the "logical and" with the return code of ```msi(*arg)```, but with whether ```msi(*arg)``` succeeds.
+
 In the new rule engine, we make this explicit, and write
 
 ````php
@@ -2097,8 +2099,8 @@ Now we have a syntactically valid rule for the new rule engine. Make sure to sav
 
 #### Other things to consider:
 
-The ```like``` expression only supports one type of wildcard "*" (as I do not know of any other wildcards that are being used"), if your rule uses other kinds of wildcard, it can be converted to the regular expression
-If you still get a type error, you can try to convert the value to the correct type using one of the following functions: "int", "double", "bool", or "str". For example, if you have an error with
+The ```like``` expression only supports one type of wildcard ```*``` (as I do not know of any other wildcards that are being used"), if your rule uses other kinds of wildcard, it can be converted to the regular expression
+If you still get a type error, you can try to convert the value to the correct type using one of the following functions: ```int```, ```double```, ```bool```, or ```str```. For example, if you have an error with
 
 ````php
   *A = 1;
@@ -2111,109 +2113,97 @@ and msi expects a string argument, you can do this by
   msi(str(*A));
 ````
 
-If you are using the msiCollectionSpider microservice, the actions have to be quoted, which can be done using [Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine#Quoting](https://wiki.irods.org/index.php/Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine#Quoting_Code) Code. The variables used in the actions are not accessible outside the actions. This is a result of stricter variables scopes. We will address this issue in future releases.
+If you are using the msiCollectionSpider microservice, the actions have to be quoted, which can be done using [Quoting](https://wiki.irods.org/index.php/Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine#Quoting_Code) Code. The variables used in the actions are not accessible outside the actions. This is a result of stricter variables scopes. We will address this issue in future releases.
 
 ## Language Integrated General Query
 
-Starting from version 3.2, the Rule Engine supports Language Integrated
-General Query (LIGQ). Before 3.2, if a rule needs to perform a gen query, it
-needs to call a sequence of micro services and manually manage the
-continuation index and the input and output data structures. LIGQ provides
-native syntax support for gen queries in the rule language and integrates
-automatic management of continuation index and the input and output data
-structures into the foreach loop. The goal is to make performing gen queries
-from rules easy and less error-prone.
+Starting from version 3.2, the Rule Engine supports Language Integrated General Query (LIGQ). Before 3.2, if a rule needs to perform a gen query, it needs to call a sequence of micro services and manually manage the continuation index and the input and output data structures. LIGQ provides native syntax support for gen queries in the rule language and integrates automatic management of continuation index and the input and output data structures into the foreach loop. The goal is to make performing gen queries from rules easy and less error-prone.
+A query expression starts with the key word SELECT and looks exactly the same as a normal gen query:
 
-A query expression starts with the key word SELECT and looks exactly the same
-as a normal gen query:
-
+````php
 SELECT META_DATA_ATTR_NAME WHERE DATA_NAME = 'data_name'
+````
 
-At runtime this query is evaluated to an object of type genQueryInp_t *
-genQueryOut_t. This object can be assigned to a variable:
+At runtime this query is evaluated to an object of type genQueryInp_t * genQueryOut_t. This object can be assigned to a variable:
 
-  * A = SELECT META_DATA_ATTR_NAME WHERE DATA_NAME = 'data_name';
+````php
+*A = SELECT META_DATA_ATTR_NAME WHERE DATA_NAME = 'data_name';
+````
 
 and iterated in a foreach loop:
 
-foreach(*Row in *A) { ... }
+````php
+foreach(*Row in *A) {
+    ...
+}
+````
 
 Or we can skip the assignment:
+````php
+foreach(*Row in SELECT META_DATA_ATTR_NAME WHERE DATA_NAME = 'data_name' AND COLL_NAME = 'coll_name') {
+    ...
+}
+````
 
-foreach(*Row in SELECT META_DATA_ATTR_NAME WHERE DATA_NAME = 'data_name' AND
-COLL_NAME = 'coll_name') { ... }
-
-where *Row is a keyValPair_t object that contains the current row in the
-result set. The break statement can be used to exit the foreach loop.
+where *Row is a keyValPair_t object that contains the current row in the result set. The break statement can be used to exit the foreach loop.
 
 LIGQ supports the following gen query syntax:
 
-  * count, sum, order_desc, order_asc
-  * =, <>, >, <, >=, <=, in, between, like, not like
-  * || and && (added after the 3.2 release)
+* ```count```, ```sum```, ```order_desc, order_asc```
+* ```=```, ```<>```, ```>```, ```<```, ```>=```, ```<=```, ```in```, ```between```, ```like```, ```not like```
+* ```||``` and ```&&``` (added after the 3.2 release)
 
-LIGO also provides support for using "==" and "!=" as equality predicates, in
-order to be consistent with the rule engine syntax.
+LIGO also provides support for using ```==``` and ```!=``` as equality predicates, in order to be consistent with the rule engine syntax.
 
-The left hand side of comparison operators is always a column name, but the
-right hand side of a comparison operator is always one (or more in the case of
-"between") normal Rule Engine expression(s) which is(are) evaluated by the
-rule engine first. Therefore, we can use any rule engine expression on the
-right hand side of a comparison operator. If the right hand side operand is
-not a simple single quoted string or number, then the LIGO query cannot be
-executed from the iquery command.
+The left hand side of comparison operators is always a column name, but the right hand side of a comparison operator is always one (or more in the case of ```between```) normal Rule Engine expression(s) which is(are) evaluated by the rule engine first. Therefore, we can use any rule engine expression on the right hand side of a comparison operator. If the right hand side operand is not a simple single quoted string or number, then the LIGO query cannot be executed from the iquery command.
 
-One potential confusion is that the "like" and "not like" operators in the gen
-query syntax differ from those in the Rule Language. The right hand side
-operand is first evaluated by the rule engine to a string which in turn is
-interpreted by the qen query subsystem. Therefore, LIGQ queries do not use the
-same syntax for wildcards as the rule engine (unless the wildcards are in a
-nested rule engine expression). While the rule engine uses "*" for wildcards,
-qen query uses the standard SQL syntax for wildcards.
+One potential confusion is that the ```like``` and ```not like``` operators in the gen query syntax differ from those in the Rule Language. The right hand side operand is first evaluated by the rule engine to a string which in turn is interpreted by the qen query subsystem. Therefore, LIGQ queries do not use the same syntax for wildcards as the rule engine (unless the wildcards are in a nested rule engine expression). While the rule engine uses ```*``` for wildcards, qen query uses the standard SQL syntax for wildcards.
 
 ## Path Literals
 
-'''This feature is added after the 3.2 release'''
+This feature is added after the 3.2 release
 
 A path literal starts with a slash:
 
+````php
 /tempZone/home/rods
+````
 
-A path literal is just like a string, you can use variable expansion, escape
-characters, etc:
+A path literal is just like a string, you can use variable expansion, escape characters, etc:
 
-/*Zone/home/*User/  
-.txt
+````php
+/*Zone/home/*User/\\.txt
+````
 
-In addition to the characters that must be escaped in a string, the following
-characters must also be escaped in a path literal:
+In addition to the characters that must be escaped in a string, the following characters must also be escaped in a path literal:
 
-,(comma) ;(semicolon) )(right parenthesis) (space)
+````php
+,(comma) ;(semicolon) )(right parenthesis)  (space)
+````
 
 A path literal can be assigned to a variable:
 
 ````php
-*H = /tempZone/home/rods
+  *H = /tempZone/home/rods
 ````
 
-New path literals can be constructed from paths but it must start with "/",
-the rule engine automatically removes redundant leading slashes in a path:
+New path literals can be constructed from paths but it must start with "/", the rule engine automatically removes redundant leading slashes in a path:
 
 ````php
 *F = /*H/foo.txt
 ````
 
-Path literals can be used in various places. If a path literal points to a
-collection, it can be used in a foreach loop to loop over all data objects
-under that collection.
+Path literals can be used in various places. If a path literal points to a collection, it can be used in a foreach loop to loop over all data objects under that collection.
 
 ````php
-foreach(*D in *H) { ... }
+  foreach(*D in *H) {
+      ...
+  }
 ````
 
-A path literal can also be used in collection and data object related
-microservice calls:
+A path literal can also be used in collection and data object related microservice calls:
 
 ````php
-msiCollCreate(/*H/newColl, "", *Status); msiRmColl(/*H/newColl, "", *Status);
+  msiCollCreate(/*H/newColl, "", *Status);
+  msiRmColl(/*H/newColl, "", *Status);
 ````
