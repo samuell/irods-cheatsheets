@@ -990,68 +990,126 @@ left hand side of the assignment in the let expression is a let-bound
 variable. The scope of such a variable is within the let expression. A let
 bound variable should not be reassigned inside the let expression.
 
-### The "match" Expression
+### The ```match``` Expression
 
 If a data type has more than one data structure, then the "match" expression
-is useful. match <expr> with
+is useful
 
-<pattern> => <expr>  
----  
+````php
+match <expr> with
+   | <pattern> => <expr>
+   ...
+   | <pattern> => <expr>
+````
   
-...
-
-<pattern> => <expr>  
----  
-  
-For example, given the "nat" data type we defined earlier, we can define the
-following function using the "match" expression add(*x, *y) = match *x with
+For example, given the ```nat``` data type we defined earlier, we can define the
+following function using the ```match``` expression
+````php
+add(*x, *y) =
+   match *x with
+       | zero => *y
+       | succ(*z) => succ(add(*z, *y))
+````
 
 zero => *y  
 ---  
-succ(*z) => succ(add(*z, *y))  
-  
-For another example, given the "tree" data type we defined earlier, we can
-define the following function size(*t) = match *t with
 
-empty => 0  
----  
-node(*v, *l, *r) => 1 + size(*l) + size(*r)  
-  
+For another example, given the "tree" data type we defined earlier, we can
+define the following function
+
+````php
+size(*t) =
+   match *t with
+       | empty => 0
+       | node(*v, *l, *r) => 1 + size(*l) + size(*r)
+````
+
+
 ## Recovery Chain For Control Structures
 
 ### Sequence
 
-Actions: A1##A2##...##An Recovery: R1##R2##...##Rn
+Actions:
+````php
+A1##A2##...##An
+````
 
-Rulegen syntax: A1:::R1 A2:::R2 ... An:::Rn
+Recovery:
+````php
+R1##R2##...##Rn
+````
 
-If Ax fails, then Rx, ..., R1 are executed
+Rulegen syntax: 
+````php
+  A1:::R1
+  A2:::R2
+  ...
+  An:::Rn
+````
+
+If Ax fails, then ```Rx, ..., R1``` are executed
 
 ### Branch
 
-Action: if(cond, A11##A12##...##A1n, A21##A22##...##A2n, R11##R12##...##R1n,
-R21##R22##...##R2n) Recovery: R
+Action: 
+````php
+if(cond, A11##A12##...##A1n, A21##A22##...##A2n,
+         R11##R12##...##R1n, R21##R22##...##R2n)
+````
 
-Rulegen syntax: if(cond) then { A11:::R11 A12:::R12 ... A1n:::R1n } else {
-A21:::R21 A22:::R22 ... A2n:::R2n }:::R
+Recovery:
+````php
+R
+````
 
-If Axy fails, then Rxy, ..., Rx1, R are executed. If cond fails, then R is
+Rulegen syntax:
+````php
+if(cond) then {
+    A11:::R11
+    A12:::R12
+    ...
+    A1n:::R1n
+} else {
+    A21:::R21
+    A22:::R22
+    ...
+    A2n:::R2n
+}:::R
+````
+
+If Axy fails, then ```Rxy, ..., Rx1, R``` are executed. If ```cond``` fails, then ```R``` is
 executed.
 
 ### Loop
 
-#### "while"
+#### ```while```
 
-Action: while(cond, A1##A2##...##An R1##R2##...##Rn) Recovery: R
+Action: 
+````php
+  while(cond, A1##A2##...##An
+              R1##R2##...##Rn)
+````
+Recovery:
+````php
+R
+````
 
-Rulegen syntax: while(cond) { A1:::R1 A2:::R2 ... An:::Rn }:::R
+Rulegen syntax: 
+````php
+  while(cond) {
+      A1:::R1
+      A2:::R2
+      ...
+      An:::Rn
+  }:::R
+````
 
-If Ax fails, then Rx, ..., R1, R are executed. If cond fails, then R is
-executed. Here R should deal with the loop invariant. The recovery chain in
-the loop restores the loop invariant, and the R restores the machine status
+If ```Ax``` fails, then ```Rx, ..., R1, R``` are executed. If ```cond``` fails, then ```R``` is
+executed. Here ```R``` should deal with the loop invariant. The recovery chain in
+the loop restores the loop invariant, and the ```R``` restores the machine status
 from the loop invariant to before the loop is executed.
 
-#### "foreach"
+#### ```foreach```
 
 Action: foreach(coll, A1##A2##...##An R1##R2##...##Rn) Recovery: R
 
@@ -1060,12 +1118,25 @@ then Rx, ..., R1, R are executed.
 
 #### "for"
 
-Action: for(init, cond, incr, A1##A2##...##An R1##R2##...##Rn) Recovery: R
-
-Rulegen syntax: for(init; cond; incr) { A1:::R1 A2:::R2 ... An:::Rn }:::R
-
-If Ax fails, then Rx, ..., R1, R are executed. If init, cond, or incr fails,
-then R is executed.
+Action:
+````php
+  for(init, cond, incr, A1##A2##...##An
+                        R1##R2##...##Rn)
+````
+Recovery:
+````php
+R
+````
+Rulegen syntax:
+````php
+for(init; cond; incr) {
+    A1:::R1
+    A2:::R2
+    ...
+    An:::Rn
+}:::R
+````
+If ```Ax``` fails, then ```Rx, ..., R1, R``` are executed. If ```init```, ```cond```, or ```incr``` fails, then ```R``` is executed.
 
 ## Types
 
