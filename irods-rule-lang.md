@@ -88,43 +88,43 @@ writeLine("stdout", "This "++" is "++" a string.");
 # Output: This is a string.
 ````
 
-Infix wildcard expression matching operator ```like```
+**Infix wildcard expression matching operator**: ```like```
 ````php
 writeLine("stdout", "This is a string." like "This is*");
 # Output: true
 ````
 
-Infix regular expression matching operator ```like regex```
+**Infix regular expression matching operator**: ```like regex```
 ````php
 writeLine("stdout", "This is a string." like regex "This.*string[.]");
 # Output: true
 ````
 
-Substring function ```substr()```
+**Substring**: ```substr()```
 ````php
 writeLine("stdout", substr("This is a string.", 0, 4));
 # Output: This
 ````
 
-Length function ```strlen()```
+**Length**: ```strlen()```
 ````php
 writeLine("stdout", strlen("This is a string."));
 # Output: 17
 ````
 
-Split function ```split()```
+**Split**: ```split()```
 ````php
 writeLine("stdout", split("This is a string.", " "));
 # Output: [This,is,a,string.]
 ````
 
-Trim left function ```triml(\*str, \*del)```, which trims from ```*str``` the leftmost ```*del```.
+**Trim left**: ```triml(\*str, \*del)```, which trims from ```*str``` the leftmost ```*del```.
 ````php
 writeLine("stdout", triml("This is a string.", " "));
 # Output: is a string.
 ````
 
-Trim right function ```trimr(*str, *del)```, which trims from ```*str``` the rightmost ```*del```.
+**Trim right**: ```trimr(*str, *del)```, which trims from ```*str``` the rightmost ```*del```.
 ````php
 writeLine("stdout", trimr("This is a string.", " "));
 # Output: This is a
