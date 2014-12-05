@@ -642,30 +642,72 @@ To use a rule, call it as if it was a microservice.
 #### Lists
 
 The new rule engine provides built-in support for lists. A list can be created
-using the "list" microservice. For example, list("This","is","a","list") The
-elements of a list should have the same type. Elements of a list can be
+using the ```list()``` microservice. For example
+````php
+list("This","is","a","list")
+````
+The elements of a list should have the same type. Elements of a list can be
 retrieved using the "elem" microservice. The index starts from 0. For example,
-elem(list("This","is","a","list"),1) evaluates to "is". If the index is out of
-range it fails with error code -1. The "setelem" takes in three parameters, a
-list, an index, and a value, and returns a new list that is identical with the
-list given by the first parameter except that the element at the index given
-by the second parameter is replace by the value given by the third parameter.
-setelem(list("This","is","a","list"),1,"isn't") evaluates to
-list("This","isn't","a","list"). If the index is out of range it fails with an
-error code. The "size" microservice takes in on parameter, a list, and returns
-the size of the list. For example, size(list("This","is","a","list"))
-evaluates to 4. The "hd" microservice returns the first element of a list and
-the "tl" microservice returns the rest of the list. If the list is empty then
-it fails with an error code. hd(list("This","is","a","list")) evaluates to
-"This" and tl(list("This","is","a","list")) evaluates to
-list("is","a","list"). The "cons" microservice returns a list by combining an
-element with another list. For example, cons("This",list("is","a","list"))
-evaluates to list("This","is","a","list").
+````php
+elem(list("This","is","a","list"),1)
+````
+evaluates to "is". 
+
+If the index is out of range it fails with error code -1. 
+
+The ```setelem()``` takes in three parameters, a list, an index, and a value, 
+and returns a new list that is identical with the list given by the first 
+parameter except that the element at the index given by the second parameter 
+is replace by the value given by the third parameter.
+````php
+setelem(list("This","is","a","list"),1,"isn't")
+````
+evaluates to
+````php
+list("This","isn't","a","list").
+````
+If the index is out of range it fails with an error code. The ```size``` 
+microservice takes in on parameter, a list, and returns the size of the list. 
+
+For example
+````php
+size(list("This","is","a","list"))
+````
+evaluates to ```4```. 
+
+The ```hd()``` microservice returns the first element of a list and
+the ```tl()``` microservice returns the rest of the list. 
+
+If the list is empty then it fails with an error code. 
+
+````php
+hd(list("This","is","a","list"))
+````
+evaluates to "This" and 
+````php
+tl(list("This","is","a","list"))
+````
+evaluates to 
+````php
+list("is","a","list")
+````
+The ```cons()``` microservice returns a list by combining an
+element with another list. For example
+````php
+cons("This",list("is","a","list"))
+````
+evaluates to
+````php
+list("This","is","a","list").
+````
 
 #### Tuples
 
-The new rule engine supports built-in data type tuple. ( <component>, ...,
-<component> ) Different components may have different types.
+The new rule engine supports built-in data type tuple. 
+````php
+( <component>, ..., <component> ) 
+````
+Different components may have different types.
 
 #### Interactions with Packing Instructions
 
@@ -676,10 +718,30 @@ lists. When remote execute or delay execution is called while there is a
 complex list in the current runtime environment, an error will be generated.
 For example, in the following rule test {
 
-  * A = list(list(1,2),list(3,4));
-  * B = elem(*A, 1); delay("<PLUSET>1m</PLUSET>") { writeLine("stdout", *B); } } Even though *A is not used in the delay execution block, the rule will still generate an error. One solution to this is to create a rule with only necessary values. test {
-  * A = list(list(1,2),list(3,4));
-  * B = elem(*A, 1); test(*B); } test(*B) { delay("<PLUSET>1m</PLUSET>") { writeLine("stdout", *B); } }
+````php
+test {
+   *A = list(list(1,2),list(3,4));
+   *B = elem(*A, 1);
+   delay("<PLUSET>1m</PLUSET>") {
+       writeLine("stdout", *B);
+   }
+}
+````
+
+Even though ```*A``` is not used in the delay execution block, the rule will still generate an error. One solution to this is to create a rule with only necessary values. 
+
+````php
+test {
+   *A = list(list(1,2),list(3,4));
+   *B = elem(*A, 1);
+   test(*B);
+}
+test(*B) {
+   delay("<PLUSET>1m</PLUSET>") {
+       writeLine("stdout", *B);
+   }
+}
+````
 
 ### Inductive Data Type
 
@@ -688,64 +750,63 @@ The features discussed in this section are currently '''under development'''.
 The new rule engine allows defining inductive data types. An inductive data
 type is a data type for values that can be defined inductively, i.e. more
 complex values can be constructed from simpler values using constructors. The
-general syntax for inductive data type definition is data <name> [ ( <type
-parameter list> ) ] =
+general syntax for inductive data type definition is
 
-<data constructor name> : <data constructor type>  
----  
-  
-...
+````php
+data <name> [ ( <type parameter list> ) ] =
+    |  : <data constructor type>
+    ...
+    | <data constructor name> : <data constructor type>
+````
 
-<data constructor name> : <data constructor type>  
----  
-  
 For example, a data type that represents the natural numbers can be defined as
+
+````php
 data nat =
-
-zero : nat  
----  
-succ : nat -> nat  
+    | zero : nat
+    | succ : nat -> nat
+````
   
-Here the type name defined is "nat." The type parameter list is empty. If the
-type parameter list is empty, we may omit it. There are two data constructors.
-The first constructor "zero" has type "nat," which means that "zero" is a
-nullary constructor of nat. We use "zero" to represent "0". The second
-constructor "succ" has type "nat -> nat" which means that "succ" is unary
-constructor of nat. We use "succ" to represent the successor. With these two
-constructors we can represent all natural numbers: zero, succ(zero),
-succ(succ(zero)), ... As another example, we can define a data type that
-represents binary trees of natural numbers data tree =
+Here the type name defined is “nat.” The type parameter list is empty. If the type parameter list is empty, we may omit it. There are two data constructors. The first constructor “zero” has type “nat,” which means that “zero” is a nullary constructor of nat. We use “zero” to represent “0”. The second constructor “succ” has type “nat -> nat” which means that “succ” is unary constructor of nat. We use “succ” to represent the successor. With these two constructors we can represent all natural numbers: ```zero, succ(zero), succ(succ(zero)), ...``` As another example, we can define a data type that represents binary trees of natural numbers
 
-empty : tree  
----  
-node : nat * tree * tree -> tree  
+````php
+  data tree =
+      | empty : tree
+      | node : nat * tree * tree -> tree
+````
   
-The "empty" constructor constructs an empty tree, and the "node" constructor
-takes in a "nat" value, a left subtree, and a right subtree and constructs a
+The ```empty``` constructor constructs an empty tree, and the ```node``` constructor
+takes in a ```nat``` value, a left subtree, and a right subtree and constructs a
 tree whose root node value is the "nat" value. The next example shows how to
 define a polymorphic data type. Suppose that we want to generalize our binary
 tree data type to those trees whose value type is not "nat." We give the type
-tree a type parameter X data tree(X) =
+tree a type parameter X
 
-empty : tree(X)  
----  
-node : X * tree(X) * tree(X) -> tree(X)  
+````php
+data tree(X) =
+    | empty : tree(X)
+    | node : X * tree(X) * tree(X) -> tree(X)
+````
   
-With a type parameter, "tree" is not a type, but a unary type constructor. A
+With a type parameter, ```tree``` is not a type, but a unary type constructor. A
 type constructor constructs types from other types. For example, the data type
 of binary trees of natural numbers is "tree(nat)." By default, the rule engine
 parses all types with that starts with uppercase letter as type variables.
 
 Just as data constructors, type constructor can also take multiple parameters.
-For example, data pair(X, Y) =
+For example
 
-pair : X * Y -> pair(X, Y)  
----  
+````php
+data pair(X, Y) =
+    | pair : X * Y -> pair(X, Y)
+````
   
 Given the data type definition of "pair", we can construct a pair using "pair"
 the data constructor. For example,
 
-  * A = pair(1, 2);
+````php
+*A = pair(1, 2);
+````
 
 ### Pattern Matching
 
