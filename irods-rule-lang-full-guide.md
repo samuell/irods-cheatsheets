@@ -1254,31 +1254,48 @@ be coerced to another type and how their values should be converted. The type
 coercion relation can be considered as a directed graph, with types as its
 vertices, and type coercion functions as its edges.
 
-The current coercion relation, denoted by "->" below, consists of the
+The current coercion relation, denoted by ```->``` below, consists of the
 following rules.
 
-SCIntegerDouble: integer -> double SCDynamicLeft: dynamic -> y SCDynamicRight:
-x -> dynamic
+````php
+SCIntegerDouble: integer -> double
+SCDynamicLeft: dynamic -> y
+SCDynamicRight: x -> dynamic
+````
 
 All coercion functions in the coercion relation are total.
 
 ### Types by Examples
 
 For example binary arithmetic operators such as addition and subtraction are
-given type: forall X in {integer double}, f X * f X -> X This indicates that
-the operator takes in two parameters of the same type and returns a value of
+given type: 
+````php
+forall X in {integer double}, f X * f X -> X
+````
+This indicates that the operator takes in two parameters of the same type and returns a value of
 the same type as its parameters. The parameter type is bounded by {integer
 double}, which means that the micro service applies to only integers or
 doubles, but the "f" indicates that if anything can be coerced to these types,
 they can also be accepted with a runtime conversion inserted. Examples:
 
-(a) double + double => X = double 1.0+1.0 (b) int + double => X = double 1+1.0
-(c) integer + integer => X = {integer double} 1+1 (d) unknown + double => X =
-double
-
+(a) double + double => X = double 
+````php
+1.0+1.0 
+````
+(b) int + double => X = double 
+````php
+1+1.0
+````
+(c) integer + integer => X = {integer double} 
+````php
+1+1 
+````
+(d) unknown + double => X = double
 Assuming that *A is a fresh variable
-
-  * A+1.0 The type checker generate a constraint that the type of *A can be coerced to double.
+````php
+*A+1.0
+````
+The type checker generate a constraint that the type of ```*A`` can be coerced to double.
 
 (e) unknown + unknown => X = {integer double}
 
@@ -1288,42 +1305,86 @@ Assuming that *A and *B are fresh variables
 
 Some typing constraints can be solved within certain context. For example, if
 we put (e) in to the following context
-
-  * B = 1.0;
-  * B = *A + *B; then we can eliminate the possibility that *B is an integer, thereby narrowing the type variable X to double.
+````php
+*B = 1.0;
+*B = *A + *B;
+````
+then we can eliminate the possibility that ```*B``` is an integer, thereby narrowing the type variable ```X``` to double.
 
 Some typing constraints can be proved unsolvable. For example,
-
-  * B = *A + *B;
-  * B == ""; by the second action we know that *B has to have type string. In this case the rule engine reports a type error.
+````php
+*B = *A + *B;
+*B == "";
+````
+by the second action we know that ```*B``` has to have type string. In this case the rule engine reports a type error.
 
 However, if some typing constraints are not solvable, they are left to be
 solved at runtime.
 
 ### Variable Typing
 
-As in C, all variables in the rule language have a fixed type that can not be
-updated through an assignment.
+As in C, all variables in the rule language have a fixed type that can not be updated through an assignment.
+For example, the following does not work:
 
-For example, the following does not work: testTyping1 {
+````php
+  testTyping1 {
+      *A = 1;
+      *A = "str";
+  }
+````
 
-  * A = 1;
-  * A = "str"; }
+Once a variable ```*A``` is assigned a value ```X``` the type of the variable is given by a typing constraint
 
-Once a variable *A is assigned a value X the type of the variable is given by
-a typing constraint type of X can be coerced to type of *A For brevity, we
-sometimes denote the "can be coerced to" relation by "<=". For example, type
-of X <= type of *A The reason why the type of *A is not directly assigned to
-the type of *X is to allow the following usage testTyping2 {
+````php
+type of X can be coerced to type of *A
+````
 
-  * A = 1; # integer <= type of *A
-  * A = 2.0; # double <= type of *A } Otherwise, the programmer would have to write testTyping3 {
-  * A = 1.0;
-  * A = 2.0; } to make the rule pass the type checker.
+For brevity, we sometimes denote the "can be coerced to" relation by "<=". For example,
 
-As a more complex example, the following generates a type error: testTyping4 {
+````php
+type of X <= type of *A
+````
 
-  * A = 1; # integer <= type of *A if(*A == "str") { # type error } } If the value of a variable is dynamically typed, then a coercion is inserted. The following example works, with a runtime coercion: testTyping2 { msi(*A); if(*A == "str") { # insert coercion type of *A <= string } }
+The reason why the type of *A is not directly assigned to the type of *X is to allow the following usage
+
+````php
+testTyping2 {
+    *A = 1; # integer <= type of *A
+    *A = 2.0; # double <= type of *A
+}
+````
+
+Otherwise, the programmer would have to write
+
+````php
+testTyping3 {
+    *A = 1.0;
+    *A = 2.0;
+}
+````
+
+to make the rule pass the type checker.
+
+As a more complex example, the following generates a type error:
+
+````php
+
+testTyping4 {
+    *A = 1; # integer <= type of *A
+    if(*A == "str") { # type error
+    }
+}
+````
+
+If the value of a variable is dynamically typed, then a coercion is inserted. The following example works, with a runtime coercion:
+
+````php
+testTyping2 {
+   msi(*A);
+   if(*A == “str”) { # insert coercion type of *A <= string
+   }
+}
+````
 
 ### Type Declaration
 
