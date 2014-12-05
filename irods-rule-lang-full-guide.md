@@ -176,18 +176,12 @@ writeLine("stdout", "'");
 
 ````php
 writeLine("stdout", "\'");
-output ' 
+# output ' 
 ````
 
 The rule engine also supports various escaped characters: 
 ````php
-\n
-\r
-\t, 
-\'
-\"
-\$
-\*
+\n, \r, \t, \', \", \$, \*
 ````
 
 An asterisk should always be escaped if it is a regular
@@ -222,7 +216,7 @@ format.
 The default format is
 
 ````php
-"%b %d %Y %H:%M:%S"
+%b %d %Y %H:%M:%S
 ````
 
 The format string uses the same directives as the standard C library.
@@ -317,27 +311,47 @@ writeLine("stdout", trimr("This is a string.", " "));
 ### Variable Expansion
 
 In a quoted string, an asterisk followed immediately by a variable name
-(without whitespaces) makes an expansion of the variable. For example, ```"This
-is *x."``` is equivalent to ```"This is "++str(*x)++"."```
+(without whitespaces) makes an expansion of the variable. For example, 
+
+````php
+"This is *x."
+````
+is equivalent to 
+````php
+"This is "++str(*x)++"."
+````
 
 ### Rules for Quoting Action Arguments
 
 A parameter to a microservice is of type string if the expected type is
-MS_STR_T or STRING. When a microservice expects a parameter of type string and
+```MS_STR_T``` or ```STRING```. When a microservice expects a parameter of type string and
 the argument is a string constant, the argument has to be quoted. For example,
-writeLine("stdout", "This is a string."); When a microservice expects a
-parameter of type string and the argument is not of type string, a type error
+
+````php
+writeLine("stdout", "This is a string.");
+````
+
+When a microservice expects a parameter of type string and the argument is not of type string, a type error
 may be thrown. For example,
 
 ````php
 *x = 123; 
 strlen(*x); 
 ````
-This error can be fixed by either using the "str" function strlen(str(*x)); or putting *x into quotes strlen("*x"); Action names and keywords such as for, while, assign are not arguments. Therefore, they do not have to be quoted.
+
+This error can be fixed by either using the "str" function 
+````php
+strlen(str(*x));
+````
+or putting ```*x``` into quotes 
+````
+strlen("*x");
+````
+Action names and keywords such as ```for```, ```while```, ```assign``` are not arguments. Therefore, they do not have to be quoted.
 
 ### Wildcard and Regular Expression
 
-The new rule engine supports both the wildcard matching operator "like" and a
+The new rule engine supports both the wildcard matching operator ```like``` and a
 new regular expression matching operator ```like regex```. (It is an operator, not
 two separate keywords.) Just as the old rule engine does, the new rule engine
 supports the ```*``` wildcard. For example, 
@@ -375,33 +389,43 @@ writeLine(\"stdout\", \*A)
 or
 
 ````php
- *A like regex "a\*c\\\\\\[\\]" # matches the regular expression a*c\\\[\] matches the regular expression a*c\\\[\]
+ *A like regex "a\*c\\\\\\[\\]" # matches the regular expression a*c\\\[\]
 ````
 
 In this case you can use "``" instead of the regular quotes. The rule
 engine does not further look for variables, etc. in strings between two "``"s.
-With "``", the examples can be written as: ``writeLine("stdout", *A)`` and
+With "``", the examples can be written as: 
 
-  * A like regex ``a*c  
-\\[\\]``
+````php
+``writeLine("stdout", *A)``
+````
+and
+````php
+*A like regex ``a*c\\\[\]``
+````
+
 
 ## Dot Expression
 
-'''This feature is added after the 3.2 release'''
+**This feature is added after the 3.2 release**
 
 The dot oeprator provides a simple syntax for creating and accessing key
 values pair.
 
 To write to a key value pair, use the dot operator on the left hand side:
 
-  * A.key = "val"
+````php
+*A.key = "val"
+````
 
 If the key is not a syntactically valid identifier, quotes can be used, escape
 rules for strings also apply:
 
-  * A."not an identifier" = "val"
+````php
+*A."not an identifier" = "val"
+````
 
-If the variable *A is undefined, a new key value pair data structure will be
+If the variable ```*A``` is undefined, a new key value pair data structure will be
 created.
 
 To read from a key value pair, use the dot operator as binary infix operation
@@ -412,19 +436,22 @@ Currently key value pairs only support the string type for values.
 The str() function is extended to support converting a key value pair data
 structure to an options format:
 
-  * A.a=A;
-  * A.b=B;
-  * A.c=C; str(*A); # a=A++++b=B++++c=C
+````php
+*A.a=A;
+*A.b=B;
+*A.c=C; 
+str(*A); # a=A++++b=B++++c=C
+````
 
 ## Constant
 
-'''This feature is added after the 3.2 release'''
+**This feature is added after the 3.2 release**
 
 A constant can be defined as a function that returns a constant. A constant
 defintion has the following syntax:
-
+````php
 <constant name> = <constant value>
-
+````
 where the constant value can be on of the following:
 
   * an integer
@@ -436,20 +463,23 @@ A constant name can be used in a pattern and is replaced by its value (whereas
 a nonconstant is treated as a constructor). For example,
 
 With
-
+````php
 CONSTANT = 1
+````
 
 the following expression
+````php
+match CONSTANT with
+   CONSTANT => "CONSTANT"
+   *_ => "NOT CONSTANT"
+````
 
-match CONSTANT with CONSTANT => "CONSTANT"
-
-  * _ => "NOT CONSTANT"
-
-returns "CONSTANT". With a nonconstant function definition such as
-
+returns ```CONSTANT```. With a nonconstant function definition such as
+````php
 CONSTANT = time()
+````
 
-it returns "NOT CONSTANT".
+it returns ```NOT CONSTANT```.
 
 ## Variable
 
