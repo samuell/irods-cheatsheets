@@ -812,15 +812,25 @@ the data constructor. For example,
 
 #### Pattern Matching In Assignment
 
-Patterns are similar to expressions. For example, pair(*X, *Y) There are a few
-restrictions. First, only data constructors and free variables may appear in
+Patterns are similar to expressions. For example
+````php
+pair(*X, *Y)
+````
+There are a few restrictions. First, only data constructors and free variables may appear in
 patterns. Second, each variable only occurs once in a pattern (sometimes
-called linearity). To retrieve the components of *A, we can use patterns on
-the left hand side of an assignment. For example, pair(*X, *Y) = *A; When this
-action is executed, *X will be assigned to 1 and *Y will be assigned to 2.
-Patterns can be combined with let expressions. For example, fib(*n) = if *n==0
-then pair(-1, 0) else if *n==1 then (0, 1) else let pair(*a, *b) = fib(*n - 1)
-in pair(*b, *a + *b)
+called linearity). To retrieve the components of ```*A```, we can use patterns on
+the left hand side of an assignment. For example
+````php
+pair(*X, *Y) = *A;
+````
+When this action is executed, ```*X``` will be assigned to 1 and ```*Y``` will be assigned to ```2```.
+Patterns can be combined with let expressions. For example
+````php
+fib(*n) = if *n==0 then pair(-1, 0)
+    else if *n==1 then (0, 1)
+    else let pair(*a, *b) = fib(*n - 1) in
+        pair(*b, *a + *b)
+````
 
 #### Pseudo Data Constructors
 
