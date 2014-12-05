@@ -4,21 +4,21 @@
 
 ### Comments
 
-````c
+````php
 # <- Comments are written by starting a line with the hash character
 ## <- Avoid using double hashes (used for other purpose in the one line rule syntax)
 ````
 
 ## Directives
 
-````c
+````php
 # The following line will include the file definitions.re
 @include "definitions" 
 ````
 
 ## Boolean operators
 
-````c
+````php
 true  # True
 false # False
 !     # Not
@@ -30,7 +30,7 @@ false # False
 ## Numbers
 
 ### Numeric literals
-````c
+````php
 1          # integer
 1.0        # double
 floor(1.5) # Will return integer 1
@@ -39,7 +39,7 @@ ceiling(1.5) # Will return integer 2
 Note: Integer division as found in C, C++, and Java is not implemented. Instead, division between integers is the same as division between doubles.
 
 ### Arithmetic operators
-````c
+````php
 -  # Negation
 ^  # Power
 *  # Multiplication 
@@ -54,7 +54,7 @@ Note: Integer division as found in C, C++, and Java is not implemented. Instead,
 ````
 
 ### Arithmetic functions
-````c
+````php
  exp(<num>)
  log(<num>)
  abs(<num>)
@@ -68,7 +68,7 @@ Note: Integer division as found in C, C++, and Java is not implemented. Instead,
 ## Strings
 
 ### Basic string syntax
-````c
+````php
 'This is a string.'
 "This is also a string"
 "Strings are quoted with \"\", or '' characters"
@@ -76,56 +76,56 @@ Note: Integer division as found in C, C++, and Java is not implemented. Instead,
 ````
 
 ### String operators
-````c
+````php
 ++ # String concatenation
 ````
 
 ### String functions
 
 Some examples of string functions:
-````c
+````php
 writeLine("stdout", "This "++" is "++" a string.");
 # Output: This is a string.
 ````
 
 Infix wildcard expression matching operator ```like```
-````c
+````php
 writeLine("stdout", "This is a string." like "This is*");
 # Output: true
 ````
 
 Infix regular expression matching operator ```like regex```
-````c
+````php
 writeLine("stdout", "This is a string." like regex "This.*string[.]");
 # Output: true
 ````
 
 Substring function ```substr()```
-````c
+````php
 writeLine("stdout", substr("This is a string.", 0, 4));
 # Output: This
 ````
 
 Length function ```strlen()```
-````c
+````php
 writeLine("stdout", strlen("This is a string."));
 # Output: 17
 ````
 
 Split function ```split()```
-````c
+````php
 writeLine("stdout", split("This is a string.", " "));
 # Output: [This,is,a,string.]
 ````
 
 Trim left function ```triml(\*str, \*del)```, which trims from ```*str``` the leftmost ```*del```.
-````c
+````php
 writeLine("stdout", triml("This is a string.", " "));
 # Output: is a string.
 ````
 
 Trim right function ```trimr(*str, *del)```, which trims from ```*str``` the rightmost ```*del```.
-````c
+````php
 writeLine("stdout", trimr("This is a string.", " "));
 # Output: This is a
 ````
