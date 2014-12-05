@@ -138,6 +138,48 @@ writeLine("stdout", trimr("This is a string.", " "));
 "This is "++str(*x)++"."
 ````
 
+## Data Types
+
+### Lists
+
+Create a list:
+````php
+# Create a list with list():
+list("This","is","a","list")
+
+# Retrieve elements with elem() (0-indexed):
+elem(list("This","is","a","list"),0)
+# Evaluates to “This”, or fails with error code -1 if out of range.
+
+# Update a list with setelem(<list>, <index>, <value>):
+setelem(list("This","is","a","list"),1,"isn't")
+# Evaluates to list("This","isn't","a","list"). 
+
+# Get the size of a list with size(<list>).
+size(list("This","is","a","list"))
+# Evaluates to 4.
+
+# Get the head (first element) of a list with hd()
+hd(list("This","is","a","list"))
+# Evaluates to list("is","a","list").
+
+# Get the tail (remainder) of a list with tl()
+tl(list("This","is","a","list"))
+# Evaluates to list("is","a","list").
+
+# Combining an element with another list with cons(<elem>, <list):
+cons("This",list("is","a","list"))
+# Evaluates to list("This","is","a","list").
+````
+
+### Tuples
+
+````php
+# Create new tuple:
+( <component>, ..., <component> )
+# (Different components may have different types).
+````
+
 ## Type conversions
 
 ### To string
@@ -153,15 +195,6 @@ writeLine("stdout", trimr("This is a string.", " "));
 ...TBC...
 
 ## Generating and Capturing Errors
-...TBC...
-
-## Data Types
-...TBC...
-
-### Lists
-...TBC...
-
-### Tupes
 ...TBC...
 
 ## Pattern Matching
