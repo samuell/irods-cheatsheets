@@ -1204,31 +1204,46 @@ existing iRODS types by viewing the existing iRODS types as opaque types.
 
 ### Types
 
-The function parameter and return types can be <btype> ::= boolean
-
-integer  
----  
-double  
-string  
-time  
-path  
-  
-<stype> ::= <tvar> identifiers starting with uppercase letters
-
-iRODS types back quoted string  
----  
-<btype>  
-? dynamic type  
-<stype> * ... * <stype> tuple types  
-c[(<stype>, ..., <stype>)] inductive data types  
-  
-A function type is <ftype> ::= <quanti>, ..., <quanti>, <ptype> * <ptype> *
-... * <ptype> [*|+|?] -> <stype> where
-
-  * the <stype> on the right is the return type
-  * the optional *, +, or ? indicates varargs
-  * the <ptype> are parameter types of the form <ptype> ::= [(input|output)*|dynamic|actions|expression] [f] <stype> where the optional ** "input" indicates that this is an io parameter ** "output" indicates that this is an output parameter ** "dynamic" indicates that this is an io parameter or output parameter determined dynamically ** "actions" indicates that this is a sequence of actions ** "expression" indicates that this is an expression ** "f" indicates that a coercion can be inserted at compile time based on the coercion relation
-  * the <quanti> are quantifiers of the form <quanti> ::= forall <tvar> [in {<btype> ... <btype>}] where <tvar> is a type variable, and the optional set of types provides a bound for the type variable.
+The function parameter and return types can be
+````php
+  <btype> ::= boolean
+            | integer
+            | double
+            | string
+            | time
+            | path
+````
+````php
+  <stype> ::= <tvar>                   identifiers starting with uppercase letters
+            | iRODS types              back quoted string
+            | <btype>
+            | ?                        dynamic type
+            | <stype> * … * <stype>    tuple types 
+            | c[(<stype>, …, <stype>)] inductive data types
+````
+A function type is
+````php
+  <ftype> ::= <quanti>, …, <quanti>, <ptype> * <ptype> * … * <ptype> [*|+|?] -> <stype>
+````
+where 
+* the ```<stype>``` on the right is the return type
+* the optional ```*```, ```+```, or ```?``` indicates varargs
+* the ```<ptype>``` are parameter types of the form
+````php
+  <ptype> ::= [(input|output)*|dynamic|actions|expression] [f] <stype>
+````
+where the optional
+* ```input``` indicates that this is an io parameter
+** ```output``` indicates that this is an output parameter
+** ```dynamic``` indicates that this is an io parameter or output parameter determined dynamically
+** ```actions``` indicates that this is a sequence of actions
+** ```expression``` indicates that this is an expression
+** ```f``` indicates that a coercion can be inserted at compile time based on the coercion relation
+* the ```<quanti>``` are quantifiers of the form
+````php
+  <quanti> ::= forall <tvar> [in {<btype> … <btype>}]
+````
+where ```<tvar>``` is a type variable, and the optional set of types provides a bound for the type variable.
 
 ### Typing Constraint
 
