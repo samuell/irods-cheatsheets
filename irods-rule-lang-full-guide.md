@@ -1388,69 +1388,87 @@ testTyping2 {
 
 ### Type Declaration
 
-In the new rule engine, you can declare the type of a rule function or a
-microservice. If the type of an action is declared, then the rule engine will
-do more static type checking. For example, although concat(*a, *b) = *a ++ *b
-add(*a, *b) = concat(*a, *b) does not generate a static type error, add(0, 1)
-will generate a dynamic type error. This can be solved (generate static type
-errors instead of dynamic type errors) by declaring the types of the functions
-concat : string * string -> string concat(*a, *b) = *a ++ *b add : integer *
-integer -> integer add(*a, *b) = concat(*a, *b)
+In the new rule engine, you can declare the type of a rule function or a microservice. If the type of an action is declared, then the rule engine will do more static type checking. For example, although
+
+````php
+concat(*a, *b) = *a ++ *b
+add(*a, *b) = concat(*a, *b)
+````
+
+does not generate a static type error, ```add(0, 1)``` will generate a dynamic type error. This can be solved (generate static type errors instead of dynamic type errors) by declaring the types of the functions
+
+````php
+concat : string * string -> string
+concat(*a, *b) = *a ++ *b
+add : integer * integer -> integer
+add(*a, *b) = concat(*a, *b)
+````
 
 ## Microservices
 
 ### Automatic Evaluation of Arguments
 
-The new rule engine automatically evaluates expressions within arguments of
-actions, which is useful when a program needs to pass the result of an
-expression in as an argument to an action. For example, in the old rule
-engine, if we want to pass the result of an expression "1+2" as an argument to
-microservice "msi", then we need to either write something like:
+The new rule engine automatically evaluates expressions within arguments of actions, which is useful when a program needs to pass the result of an expression in as an argument to an action. For example, in the old rule engine, if we want to pass the result of an expression “1+2” as an argument to microservice “msi”, then we need to either write something like:
 
-  * A=1+2; msi(*A); or pass "1+2" in as a string to "msi" and write code in the microservice which parses and evaluates the expression. With the new rule engine, the programmer can write: msi(1+2); and the rule engine will evaluates the expression 1+2 and pass the result in.
+````php
+*A=1+2;
+msi(*A);
+````
+
+or pass ```1+2``` in as a string to ```msi``` and write code in the microservice which parses and evaluates the expression. With the new rule engine, the programmer can write:
+
+````php  
+msi(1+2);
+````
+
+and the rule engine will evaluates the expression
+````php
+1+2
+````
+and pass the result in.
 
 ### The Return Value of User Defined Microservices
 
-Both the old rule engine and the new rule engine view the return value of user
-defined microservices as an integer "errorcode." If the return value of a
-microservice is less than zero, both rule engines interpret it as a failure,
-rather than an integer value; and if the return value is greater than zero,
-both rule engines interpret it as an integer. Therefore the following
-expression
+Both the old rule engine and the new rule engine view the return value of user defined microservices as an integer "errorcode." If the return value of a microservice is less than zero, both rule engines interpret it as a failure, rather than an integer value; and if the return value is greater than zero, both rule engines interpret it as an integer. Therefore the following expression
 
+````php  
 msi >= 0
+````
 
-either evaluates to true or fail, since when "msi" returns a negative integer,
-the rule engine interprets the value as a failure.
+either evaluates to true or fail, since when "msi" returns a negative integer, the rule engine interprets the value as a failure.
+In some applications, there is need for capturing all possible return values as regular integers. The "errorcode" microservice provided by the new rule engine can be used to achieve this. In the previous example, we can modify the code to
 
-In some applications, there is need for capturing all possible return values
-as regular integers. The "errorcode" microservice provided by the new rule
-engine can be used to achieve this. In the previous example, we can modify the
-code to
-
+````php
 errorcode(msi) >= 0
-
+````
 This expression will not fail on negative return values from msi.
 
 ### The Administration Microservices
 
-The rule engine has three groups of rule administration microservices. The
-changes made by the first group are system wide. They affect subsequent
-execution of the irule command and other parts of the iRODS system such as
-delayed execution. The changes made by second group only affects the current
-irule command. Subsequent execution of the irule command and other parts of
-the iRODS system will not be affected by these changes. The third group reads
-rules from or writes rules to files or the database.
+The rule engine has three groups of rule administration microservices. The changes made by the first group are system wide. They affect subsequent execution of the irule command and other parts of the iRODS system such as delayed execution. The changes made by second group only affects the current irule command. Subsequent execution of the irule command and other parts of the iRODS system will not be affected by these changes. The third group reads rules from or writes rules to files or the database.
+The first group includes
 
-The first group includes msiAdmAppendToTopOfCoreRE msiAdmChangeCoreRE
+````php
+msiAdmAppendToTopOfCoreRE
+msiAdmChangeCoreRE
 msiAdmShowCoreRE
+````
 
-The second group includes msiAdmAddAppRuleStruct msiAdmClearAppRuleStruct
+The second group includes
+
+````php
+msiAdmAddAppRuleStruct
+msiAdmClearAppRuleStruct
 msiAdmShowIRB
+````
 
-The third group includes msiAdmWriteRulesFromStructIntoFile
-msiAdmReadRulesFromFileIntoStruct msiAdmInsertRulesFromStructIntoDB
+The third group includes
+````php
+msiAdmWriteRulesFromStructIntoFile
+msiAdmReadRulesFromFileIntoStruct
+msiAdmInsertRulesFromStructIntoDB
 msiAdmRetrieveRulesFromDBIntoStruct
+````
 
 ## Improvements to the Rule Engine
 
@@ -1465,33 +1483,34 @@ There error messages can be found in the server log.
 
 ### Indexing
 
-To improve the performance of rule execution, the new rule engine provide two
-level indexing on applicable rules. The first level of indexing is based on
-the rule name. The second level of indexing is based on rule conditions. The
-rule condition indexing can be demonstrate by the following example:
+To improve the performance of rule execution, the new rule engine provide two level indexing on applicable rules. The first level of indexing is based on the rule name. The second level of indexing is based on rule conditions. The rule condition indexing can be demonstrate by the following example:
+  
+````php
+  testRule(*A) {
+      on (*A == "a") { ... }
+      on (*A == "b") { ... }
+  }
+````
 
-testRule(*A) { on (*A == "a") { ... } on (*A == "b") { ... } }
+In this example, we have two rules with the same rule name, but different rule conditions. The first level of indexing does not improve the performance in a rule application like
 
-In this example, we have two rules with the same rule name, but different rule
-conditions. The first level of indexing does not improve the performance in a
-rule application like testRule("a") However, the second level indexing does.
-The second level indexing works on rules with similar rule conditions. In
-particular, the rule conditions have to be of the form
+````php
+testRule("a")
+````
 
+However, the second level indexing does. The second level indexing works on rules with similar rule conditions. In particular, the rule conditions have to be of the form
+
+````php
 <expression> == <string>
+````
 
-All rules have to have the same number of parameters, but they may have
-different parameter names. The expression has to be the same for all rules
-modulo variable renaming, and the strings have to be different for different
-rules.
+All rules have to have the same number of parameters, but they may have different parameter names. The expression has to be the same for all rules modulo variable renaming, and the strings have to be different for different rules.
 
-The rule engine indexes the rules by the string. When a rule is called, the
-rule engine evaluates the expression once and looks up the rule using the
-second level indexing.
+The rule engine indexes the rules by the string. When a rule is called, the rule engine evaluates the expression once and looks up the rule using the second level indexing.
 
 ## Improvements to irule
 
-### .r and .ir Files
+### ```.r``` and ```.ir``` Files
 
 The new irule command directly accepts both .r and .ir files. The irule
 command determines the format of the input file by the file extension.
@@ -1508,25 +1527,43 @@ delayed execution or remote execution.
 
 ### Backward Compatibility Modes
 
-The new rule engine has backward compatible modes that allow it to run rules
-written for the old rule engine in the "##" syntax and a less strict grammar
-with little or no change. The backward compatible mode can be set to "true",
-"false", or "auto" using the @backwardCompatible directive. For example,
-@backwardCompatible "true" acPostProcForPut|$objPath like
-*.txt|writeLine(serverLog, text: $objPath)|nop @backwardCompatible "false"
-acPostProcForPut { on($objPath like "*.html") { writeLine("serverLog", "html:
-$objPath"); } } As shown in the example, backward compatible modes can be
-mixed within one code base. By default the backward compatible mode is set to
-"auto". In the "auto" mode, the rule engine tries to detect whether the code
-is written in the "##" syntax or the newer grammar and automatically apply
-backward compatibility to the "##" syntax.
+The new rule engine has backward compatible modes that allow it to run rules written for the old rule engine in the "##" syntax and a less strict grammar with little or no change. The backward compatible mode can be set to "true", "false", or "auto" using the @backwardCompatible directive. For example
 
-For example, the example can be written as: @backwardCompatible "auto"
-acPostProcForPut|$objPath like *.txt|writeLine(serverLog, text: $objPath)|nop
-acPostProcForPut { on($objPath like "*.html") { writeLine("serverLog", "html:
-$objPath"); } } or if you use the default setting, acPostProcForPut|$objPath
-like *.txt|writeLine(serverLog, text: $objPath)|nop acPostProcForPut {
-on($objPath like "*.html") { writeLine("serverLog", "html: $objPath"); } }
+````php
+ @backwardCompatible "true"
+ acPostProcForPut|$objPath like *.txt|writeLine(serverLog, text: $objPath)|nop
+ @backwardCompatible "false"
+ acPostProcForPut {
+     on($objPath like "*.html") {
+         writeLine("serverLog", "html: $objPath");
+     }
+ }
+````
+
+As shown in the example, backward compatible modes can be mixed within one code base. By default the backward compatible mode is set to ```auto```. In the ```auto``` mode, the rule engine tries to detect whether the code is written in the ```##``` syntax or the newer grammar and automatically apply backward compatibility to the ```##``` syntax.
+
+For example, the example can be written as:
+
+````php
+ @backwardCompatible "auto"
+ acPostProcForPut|$objPath like *.txt|writeLine(serverLog, text: $objPath)|nop
+ acPostProcForPut {
+     on($objPath like "*.html") {
+         writeLine("serverLog", "html: $objPath");
+     }
+ }
+````
+
+or if you use the default setting,
+
+````php
+ acPostProcForPut|$objPath like *.txt|writeLine(serverLog, text: $objPath)|nop
+ acPostProcForPut {
+     on($objPath like "*.html") {
+         writeLine("serverLog", "html: $objPath");
+     }
+ }
+````````
 
 ### Backward Incompatibilities
 
@@ -1534,106 +1571,164 @@ There are a few exceptions in the backward compatibility modes.
 
 #### Variables in like Expressions
 
-In the old rule engine, the follow code matches $objPath with the pattern
-"*txt": acPostProcForPut|$objPath like *txt|nop|nop In the new rule engine,
-even in backward compatibility modes, it matches $objPath with the content of
-the *txt variable, as the "*" character is followed by a letter. (Node: if the
-string is "*.txt" then there is no ambiguity) To match with the pattern
-"*txt", change the rule to acPostProcForPut|$objPath like \\*txt|nop|nop The
-"\" character escapes the "*" character following it and turns it from a
-variable prefix into a normal character.
+In the old rule engine, the follow code matches ```$objPath``` with the pattern ```*txt```:
+
+````php
+acPostProcForPut|$objPath like *txt|nop|nop
+````
+
+In the new rule engine, even in backward compatibility modes, it matches $objPath with the content of the ```*txt``` variable, as the ```*``` character is followed by a letter. (Node: if the string is ```*.txt``` then there is no ambiguity) To match with the pattern ```*txt```, change the rule to
+
+````php
+acPostProcForPut|$objPath like \*txt|nop|nop
+````
+
+The ```\``` character escapes the ```*``` character following it and turns it from a variable prefix into a normal character.
 
 #### Foreach with Comma Separated Strings
 
-In the old rule engine, the following code iterates over a comma separated
-string: rule||assign(*A, "x, y, z")##forEachExec(*A, writeLine(stdout, *A),
-nop)|nop The new rule engine generates an error when running this code. This
-rule can be implemented as: rule {
+In the old rule engine, the following code iterates over a comma separated string:
 
-  * A = split("x, y, z", ", "); foreach(*A) { writeLine("stdout", *A); } } The split function takes in two parameters, the first a string, the second a separator and then splits the string using the separator and returns a list of substrings.
+````php
+ rule||assign(*A, "x, y, z")##forEachExec(*A, writeLine(stdout, *A), nop)|nop
+````
+
+The new rule engine generates an error when running this code. This rule can be implemented as:
+
+````php
+rule {
+   *A = split("x, y, z", ", ");
+   foreach(*A) {
+       writeLine("stdout", *A);
+   }
+}
+````
+
+The split function takes in two parameters, the first a string, the second a separator and then splits the string using the separator and returns a list of substrings.
 
 #### Microservices in Rule Conditions
 
-The old rule engine allows the following code: rule|msiDoSomething|nop|nop The
-rule is executed only if the microservice "msiDoSomething" succeeds. A
-microservice is considered successful if it return an integer >=0 (usually 0)
-and failed if it returns an integer < 0\. The new rule engine requires the
-rule condition to be a boolean expression which returns either true or false.
-We could add the following implicit conversion rules: integer >= 0 -> true
-integer < 0 -> false but this would be inconsistent with the conventions of C
-and C++, where integer != 0 -> true integer == 0 -> false which would lead to
-confusion. Therefore, we didn't include those two implicit conversion rules.
-The example, however, can be written in the new rule engine as follows: rule {
-on(msiDoSomething >= 0) { } } Note that to test for the failure case, you can
-use the errorcode function: rule { on(errorcode(msiDoSomething) < 0) { } }
+The old rule engine allows the following code:
+
+````php
+rule|msiDoSomething|nop|nop
+````
+
+The rule is executed only if the microservice "msiDoSomething" succeeds. A microservice is considered successful if it return an integer >=0 (usually 0) and failed if it returns an integer < 0. The new rule engine requires the rule condition to be a boolean expression which returns either true or false. We could add the following implicit conversion rules:
+
+````php
+integer >= 0 -> true
+integer < 0  -> false
+````
+
+but this would be inconsistent with the conventions of C and C++, where
+
+````php
+integer != 0 -> true
+integer == 0 -> false
+```` 
+
+which would lead to confusion. Therefore, we didn't include those two implicit conversion rules. The example, however, can be written in the new rule engine as follows:
+
+````php
+rule {
+   on(msiDoSomething >= 0) {
+   }
+}
+````
+Note that to test for the failure case, you can use the errorcode function:
+
+````php
+rule {
+   on(errorcode(msiDoSomething) < 0) {
+   }
+}
+````
 
 #### Expressions in irule Input Parameters
 
-The old rule engine allows the input parameters to be either an unquoted
-string or an expression: testrule||writeLine(stdout, *A *D)|nop
+The old rule engine allows the input parameters to be either an unquoted string or an expression:
 
-  * A=unquoted string%*D=0 + 1 ruleExecOut While the old rule engine returns unquoted string 1 The new rule engine returns unquoted string 0 + 1 In the new rule engine, if you use the "##" syntax, then all values of input parameters are strings, quoted or unquoted. In the newer syntax, it can be written as testrule { writeLine("stdout", "*A *D"); } input *A="unquoted string", *D=0 + 1 output ruleExecOut Note that rules written in the "##" syntax have to be saved in a ".ir" file and rules written in the newer notation have to be saved in a ".r" file.
+````php
+ testrule||writeLine(stdout, *A *D)|nop
+ *A=unquoted string%*D=0 + 1
+ ruleExecOut
+````
 
-## Converting from the "##" Syntax to the New Rule Engine Syntax
+While the old rule engine returns
 
-In the 3.0 release of iRODS, a new rule engine is included that eliminates
-some corner cases where it was ambiguous, such as special charaters in
-strings, by following the conventions of mainstream programming languages. The
-resulting syntax is slightly different from the old rule engine. The old rule
-engine provides two syntaxes for writing rules. The first syntax (the "##"
-syntax), as found in the core.irb file, looks like: acPostProcForPut|$objPath
-like *.txt|msiDataObjCopy($objPath, "$objPath.copy")|nop It has the
-restriction that every rule must be written in one line for fast processing.
-The second syntax (the rulegen syntax) is a more readable form and supports
-multi-line rules. acPostProcForPut { on($objPath like *.txt) {
-msiDataObjCopy($objPath, $objPath.copy); } } However, rules written in the
-rulegen syntax have to be preprocessed using the rulegen tool into the "##"
-syntax before the old rule engine can process them. Therefore, they couldn't
-be directly included in the core.irb file. The syntax supported by the new
-rule is based on the rulegen syntax, with slight modifications. While we put
-backward compatibility at high priority, there are several concerns that lead
-us to make changes to the rulegen syntax in creating the new rule engine
-syntax.
+````php
+unquoted string 1
+````
 
-The biggest one is to eliminate ambiguities in corner cases, which we
-illustrate by the following examples. Suppose that if the content of *A is a
-string "0 + 1", should the following expression evaluate to true or false?
+The new rule engine returns
 
-  * A == 0 + 1 This ambiguity has its root in the ambiguity whether "0 + 1" on the right hand side of the comparison is a string or an integer expression. Instead of adding exceptions to existing grammatical rules, we chose instead to streamline and simplify the rule, as other mainstream programming languages do, by requiring strings to be quoted, so that
-  * A == "0 + 1" compares the content of *A with the string "0 + 1", and 
-  * A == 0 + 1 compares the content of *A with the integer expression 0 + 1.
+````php
+unquoted string 0 + 1
+````
 
-To make it easier to move rules written in the "##" syntax, the new rule
-engine provides backward compatible modes. Backward compatible modes tweak the
-rule engine parser and type checker so that they simulate the old rule engine
-when parsing the "##" syntax. In backward compatible mode, strings do not have
-to be quoted. Backward compatible modes work only with the "##" syntax.
-Backward compatible modes can be changed within a code base using the
-@backwardCompatible directive, so that users can have rules that run under
-backward compatible modes and not in just one code base. The backward
-compatible modes and their limitations are explained in
-[Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine#Backward Co
-mpatibility](Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine
-#Backward Compatibility).
+In the new rule engine, if you use the "##" syntax, then all values of input parameters are strings, quoted or unquoted. In the newer syntax, it can be written as
 
-The old rule engine is also included in the 3.0 release in case full backward
-compatibility is needed. The rule engine used by iRODS can be easily switched
-to the old one by making a small change in the server Makefile and rebuilding
-the server.
+````php
+testrule {
+   writeLine("stdout", "*A *D");
+}
+input *A="unquoted string", *D=0 + 1
+output ruleExecOut
+````
 
-This section explains how to convert a rule written in the "##" syntax to the
-new rule engine syntax. First, we look at a rule written in the "##" syntax.
+Note that rules written in the ```##``` syntax have to be saved in a ```.ir``` file and rules written in the newer notation have to be saved in a ```.r``` file.
 
-My Test Rule(*arg)|msi(*arg) && *arg like *txt|delayExec(<A></A>,
-copyDataObj(*objPath)##moveDataObj(*objPath), nop##nop)##remoteExec(localhost,
-null, writeLine(stdout, *D), nop)##assign(*A, "a, b, c")##assign(*B, *A
-string)##forEachExec(*A, writeLine(serverLog, *A), nop)|nop
+## Converting from the ```##``` Syntax to the New Rule Engine Syntax
 
-  * obj=test.txt%*D=string ruleExecOut
+In the 3.0 release of iRODS, a new rule engine is included that eliminates some corner cases where it was ambiguous, such as special charaters in strings, by following the conventions of mainstream programming languages. The resulting syntax is slightly different from the old rule engine. The old rule engine provides two syntaxes for writing rules. The first syntax (the "##" syntax), as found in the core.irb file, looks like:
 
-Next, we convert this rule into the new rule engine syntax. If a step is
-written in brackets, it means that the step is the same as that for converting
-from the "##" syntax to the rulegen syntax in iRODS 2.5.
+````php
+acPostProcForPut|$objPath like *.txt|msiDataObjCopy($objPath, "$objPath.copy")|nop
+````
+
+It has the restriction that every rule must be written in one line for fast processing. The second syntax (the rulegen syntax) is a more readable form and supports multi-line rules.
+
+````php
+acPostProcForPut {
+   on($objPath like *.txt) {
+       msiDataObjCopy($objPath, $objPath.copy);
+   }
+}
+````
+
+However, rules written in the rulegen syntax have to be preprocessed using the rulegen tool into the "##" syntax before the old rule engine can process them. Therefore, they couldn't be directly included in the core.irb file. The syntax supported by the new rule is based on the rulegen syntax, with slight modifications. While we put backward compatibility at high priority, there are several concerns that lead us to make changes to the rulegen syntax in creating the new rule engine syntax.
+The biggest one is to eliminate ambiguities in corner cases, which we illustrate by the following examples. Suppose that if the content of ```*A`` is a string ```"0 + 1"```, should the following expression evaluate to true or false?
+
+````php
+ *A == 0 + 1
+````
+
+This ambiguity has its root in the ambiguity whether ```"0 + 1"``` on the right hand side of the comparison is a string or an integer expression. Instead of adding exceptions to existing grammatical rules, we chose instead to streamline and simplify the rule, as other mainstream programming languages do, by requiring strings to be quoted, so that
+
+````php
+ *A == "0 + 1"
+````
+
+compares the content of *A with the string "0 + 1", and
+
+````php
+ *A == 0 + 1
+````
+compares the content of ```*A``` with the integer expression ```0 + 1```.
+
+To make it easier to move rules written in the ```##``` syntax, the new rule engine provides backward compatible modes. Backward compatible modes tweak the rule engine parser and type checker so that they simulate the old rule engine when parsing the "##" syntax. In backward compatible mode, strings do not have to be quoted. Backward compatible modes work only with the ```##``` syntax. Backward compatible modes can be changed within a code base using the ```@backwardCompatible``` directive, so that users can have rules that run under backward compatible modes and not in just one code base. The backward compatible modes and their limitations are explained in Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine#Backward Compatibility.
+The old rule engine is also included in the 3.0 release in case full backward compatibility is needed. The rule engine used by iRODS can be easily switched to the old one by making a small change in the server Makefile and rebuilding the server.
+
+This section explains how to convert a rule written in the ```##``` syntax to the new rule engine syntax. First, we look at a rule written in the "##" syntax.
+
+````php
+ My Test Rule(*arg)|msi(*arg) && *arg like *txt|delayExec(<A></A>, copyDataObj(*objPath)##moveDataObj(*objPath), nop##nop)##remoteExec(localhost, null, writeLine(stdout, *D), nop)##assign(*A, "a, b, c")##assign(*B, *A string)##forEachExec(*A, writeLine(serverLog, *A), nop)|nop
+ *obj=test.txt%*D=string
+ ruleExecOut
+````
+
+Next, we convert this rule into the new rule engine syntax. If a step is written in brackets, it means that the step is the same as that for converting from the ```##``` syntax to the rulegen syntax in iRODS 2.5.
 
 ### "##" => Rulegen
 
