@@ -839,12 +839,21 @@ data constructors on them for pattern matching purposes. Pseudo data
 constructors are like data constructors but can only be used in patterns.
 Pseudo data constructor definitions are like function definitions except that
 a pseudo data constructor definition starts with a tilde and must return a
-tuple. The general syntax is <name>(<param>, ..., <param>) = <expr> A pseudo
-data constructor can be thought of an inverse function that maps the values in
+tuple. The general syntax is 
+````php
+<name>(<param>, ..., <param>) = <expr>
+````
+A pseudo data constructor can be thought of an inverse function that maps the values in
 the codomain to values in the domain. For example, we can define the following
-pseudo data constructor. lowerdigits(*n) = let *a = *n % 10 in ((*n - *a) / 10
-% 10, *a) The assignment lowerdigits(*a, *b) = 256; results in *a assigned 5
-and *b assigned 6.
+pseudo data constructor
+````php
+lowerdigits(*n) = let *a = *n % 10 in ((*n - *a) / 10 % 10, *a)
+````
+The assignment
+````php
+lowerdigits(*a, *b) = 256;
+````
+results in ```*a``` assigned ```5``` and ```*b``` assigned ```6```.
 
 ## Control Structures
 
