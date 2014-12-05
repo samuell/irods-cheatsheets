@@ -142,32 +142,44 @@ writeLine("stdout", trimr("This is a string.", " "));
 
 ### Lists
 
-Create a list:
+**Create** a list with ```list()```:
 ````php
-# Create a list with list():
 list("This","is","a","list")
+````
+*Note: All elements in a list must be of the same type*
 
-# Retrieve elements with elem() (0-indexed):
+**Retrieve elements** with ```elem(<list>, <index>)``` (0-indexed):
+````php
 elem(list("This","is","a","list"),0)
 # Evaluates to “This”, or fails with error code -1 if out of range.
+````
 
-# Update a list with setelem(<list>, <index>, <value>):
+**Update** a list with ```setelem(<list>, <index>, <value>)```
+````php
 setelem(list("This","is","a","list"),1,"isn't")
 # Evaluates to list("This","isn't","a","list"). 
+````
 
-# Get the size of a list with size(<list>).
+Get the **size** of a list with ```size(<list>)```
+````php
 size(list("This","is","a","list"))
 # Evaluates to 4.
+````
 
-# Get the head (first element) of a list with hd()
+Get the **head (first element)** of a list with ```hd(<list>)```
+````php
 hd(list("This","is","a","list"))
 # Evaluates to list("is","a","list").
+````
 
-# Get the tail (remainder) of a list with tl()
+Get the **tail (remainder)** of a list with ```tl(<list>)```
+````php
 tl(list("This","is","a","list"))
 # Evaluates to list("is","a","list").
+````
 
-# Combining an element with another list with cons(<elem>, <list):
+**Combine** an element with a list with ```cons(<elem>, <list)```
+````php
 cons("This",list("is","a","list"))
 # Evaluates to list("This","is","a","list").
 ````
