@@ -7,15 +7,24 @@ configured easily by writing simple rules, yet the language is flexible enough
 to allow complex policies or actions to be defined.
 
 Everything is a rule in the iRODS Rule Language. A typical rule looks like:
-```acPostProcForPut { on($objPath like "*.txt") { msiDataObjCopy($objPath,
-"$objPath.copy"); } }``` In this rule, the rule name ```acPostProcForPut``` is an
+````php
+acPostProcForPut { 
+  on($objPath like "*.txt") { 
+    msiDataObjCopy($objPath,"$objPath.copy"); 
+  } 
+}
+````
+In this rule, the rule name ```acPostProcForPut``` is an
 event hook defined in iRODS. iRODS automatically applies this rule when
 certain events are triggered. The ```on(...)``` clause is a rule condition. The
 ```{...}``` block following the rule condition is a sequence of actions that is
 executed if the rule condition is true when the rule is applied. And the
-customary hello world rule looks like: ```HelloWorld { writeLine("stdout",
-"Hello, world!"); }```
-
+customary hello world rule looks like: 
+````php
+HelloWorld { 
+  writeLine("stdout", "Hello, world!"); 
+}
+````
 In the 3.0 release of iRODS, a new rule engine is included that comes with an
 array of new features and improvements in robustness, error reporting, etc.,
 and takes care of some corner cases where it was ambiguous, such as special
@@ -32,8 +41,10 @@ line as comments. Therefore, a comment does not have to occupy its own line.
 For example,
 
 ````php
-* A=1; # comments Although the parser is able to parse comments starting with "##", it is not recommended to start comments with "##", as "##" is also used in the one line rule syntax as the actions connector. It is recommended to start comments with "#".
+* A=1; # comments 
 ````
+
+Although the parser is able to parse comments starting with ```##```, it is not recommended to start comments with ```##```, as ```##``` is also used in the one line rule syntax as the actions connector. It is recommended to start comments with ```#```.
 
 ## Directives
 
@@ -51,8 +62,14 @@ Boolean literals include ```true``` and ```false```.
 
 ### Boolean Operators
 
-Boolean operators include ```!``` (not), ```&&``` (and), ```||``` (or), ```%%``` (or, used in
-the ```##``` syntax). For example, 
+Boolean operators include 
+````php
+!  # not
+&&`# and
+|| # or
+%% # or used in the ## syntax
+````
+For example:
 
 ````php
 true && true
