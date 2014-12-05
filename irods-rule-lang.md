@@ -3,7 +3,12 @@
 *This is an attempt to create a brief overview of the [iRODS](http://irods.org/) Rule syntax.<br>
 For more comprehensive documentation, see [this page](https://wiki.irods.org/index.php/Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine) in the [iRODS Wiki](http://wiki.irods.org).*
 
-## Basics
+## Hello World (as a rule)
+````php
+HelloWorld { writeLine("stdout", "Hello, world!"); }
+````
+
+## Basic syntax
 
 ### Comments
 
