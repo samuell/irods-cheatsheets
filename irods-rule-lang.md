@@ -5,7 +5,9 @@ For more comprehensive documentation, see [this page](https://wiki.irods.org/ind
 
 ## Hello World (as a rule)
 ````php
-HelloWorld { writeLine("stdout", "Hello, world!"); }
+HelloWorld { 
+  writeLine("stdout", "Hello, world!"); 
+}
 ````
 
 ## Basic syntax
