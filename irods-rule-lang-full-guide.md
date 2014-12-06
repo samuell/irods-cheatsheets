@@ -1,5 +1,7 @@
 ## iRODS Rule Language
 
+*This is a reformatted copy of the wiki page ["Changes and Improvements to the Rule Language and the Rule Engine" in the iRODS wiki. (Version from Sep 12, 2013)](https://wiki.irods.org/index.php?title=Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine&oldid=6991).*
+
 The iRODS Rule Language is a language provided by iRODS to define policies and
 actions in the system. The iRODS Rule Language is tightly integrated with
 other components of iRODS. Many frequently used policies and actions can be
