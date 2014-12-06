@@ -1,4 +1,4 @@
-## iRODS Rule Language
+## iRODS Rule Language (for iRODS 3.2+)
 
 *This is a reformatted copy of the wiki page ["Changes and Improvements to the Rule Language and the Rule Engine" in the iRODS wiki. (Version from Sep 12, 2013)](https://wiki.irods.org/index.php?title=Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine&oldid=6991).*
 
@@ -9,6 +9,7 @@ configured easily by writing simple rules, yet the language is flexible enough
 to allow complex policies or actions to be defined.
 
 Everything is a rule in the iRODS Rule Language. A typical rule looks like:
+
 ````php
 acPostProcForPut { 
   on($objPath like "*.txt") { 
@@ -16,17 +17,20 @@ acPostProcForPut {
   } 
 }
 ````
+
 In this rule, the rule name ```acPostProcForPut``` is an
 event hook defined in iRODS. iRODS automatically applies this rule when
 certain events are triggered. The ```on(...)``` clause is a rule condition. The
 ```{...}``` block following the rule condition is a sequence of actions that is
 executed if the rule condition is true when the rule is applied. And the
 customary hello world rule looks like: 
+
 ````php
 HelloWorld { 
   writeLine("stdout", "Hello, world!"); 
 }
 ````
+
 In the 3.0 release of iRODS, a new rule engine is included that comes with an
 array of new features and improvements in robustness, error reporting, etc.,
 and takes care of some corner cases where it was ambiguous, such as special
@@ -65,12 +69,14 @@ Boolean literals include ```true``` and ```false```.
 ### Boolean Operators
 
 Boolean operators include 
+
 ````php
 !  # not
 &&`# and
 || # or
 %% # or used in the ## syntax
 ````
+
 For example:
 
 ````php
@@ -158,7 +164,7 @@ quotes
 
 ````php
 "This is a string."`
-``` 
+```` 
 
 If a programmer needs to quote strings containing single (double) quotes using single (double) quotes, then the quotes in the
 strings should be escaped using a backslash ```"\"```, just as in the C Programming
@@ -226,7 +232,7 @@ The format string uses the same directives as the standard C library.
 ### Converting Strings to Values of Other Types
 
 String can be converted to values of type BOOLEAN, INTEGER, DOUBLE, DATETIME,
-or STRING. For example, 
+or STRING. For example
 
 ````php
 int("123")
@@ -241,7 +247,7 @@ datetimef(*str, *format)
 ````
 
 converts a string stored in ```*str``` to a datetime, according to the ```*format```
-parameter.
+parameter
 
 ````php
 datetime(*str)
@@ -269,42 +275,49 @@ writeLine("stdout", "This "++" is "++" a string.");
 ````
 
 **Infix wildcard expression matching operator**: ```like```
+
 ````php
 writeLine("stdout", "This is a string." like "This is*");
 # Output: true
 ````
 
 **Infix regular expression matching operator**: ```like regex```
+
 ````php
 writeLine("stdout", "This is a string." like regex "This.*string[.]");
 # Output: true
 ````
 
 **Substring**: ```substr()```
+
 ````php
 writeLine("stdout", substr("This is a string.", 0, 4));
 # Output: This
 ````
 
 **Length**: ```strlen()```
+
 ````php
 writeLine("stdout", strlen("This is a string."));
 # Output: 17
 ````
 
 **Split**: ```split()```
+
 ````php
 writeLine("stdout", split("This is a string.", " "));
 # Output: [This,is,a,string.]
 ````
 
 **Trim left**: ```triml(*str, *del)```, which trims from ```*str``` the leftmost ```*del```.
+
 ````php
 writeLine("stdout", triml("This is a string.", " "));
 # Output: is a string.
 ````
 
 **Trim right**: ```trimr(*str, *del)```, which trims from ```*str``` the rightmost ```*del```.
+
 ````php
 writeLine("stdout", trimr("This is a string.", " "));
 # Output: This is a
@@ -318,7 +331,9 @@ In a quoted string, an asterisk followed immediately by a variable name
 ````php
 "This is *x."
 ````
+
 is equivalent to 
+
 ````php
 "This is "++str(*x)++"."
 ````
@@ -342,13 +357,17 @@ strlen(*x);
 ````
 
 This error can be fixed by either using the "str" function 
+
 ````php
 strlen(str(*x));
 ````
+
 or putting ```*x``` into quotes 
+
 ````
 strlen("*x");
 ````
+
 Action names and keywords such as ```for```, ```while```, ```assign``` are not arguments. Therefore, they do not have to be quoted.
 
 ### Wildcard and Regular Expression
@@ -356,16 +375,18 @@ Action names and keywords such as ```for```, ```while```, ```assign``` are not a
 The new rule engine supports both the wildcard matching operator ```like``` and a
 new regular expression matching operator ```like regex```. (It is an operator, not
 two separate keywords.) Just as the old rule engine does, the new rule engine
-supports the ```*``` wildcard. For example, 
+supports the ```*``` wildcard. For example
 
 ````php
 "abcd" like "ab*"
 ````
 
 In case of ambiguity with variable expansion, the ```*``` has to be escaped. For example
+
 ````php
 "abcd" like "a\\*d"
 ````
+
 because ```"a*d"``` is interpreted as ```"a"++str(*d)+""```
 
 When wildcard is not expressive enough, regular expression matching operator
@@ -405,7 +426,6 @@ and
 ````php
 *A like regex ``a*c\\\[\]``
 ````
-
 
 ## Dot Expression
 
@@ -451,25 +471,29 @@ str(*A); # a=A++++b=B++++c=C
 
 A constant can be defined as a function that returns a constant. A constant
 defintion has the following syntax:
+
 ````php
 <constant name> = <constant value>
 ````
+
 where the constant value can be on of the following:
 
-  * an integer
-  * a double
-  * a string (with no variable expansion in it)
-  * a boolean
+* an integer
+* a double
+* a string (with no variable expansion in it)
+* a boolean
 
 A constant name can be used in a pattern and is replaced by its value (whereas
 a nonconstant is treated as a constructor). For example,
 
 With
+
 ````php
 CONSTANT = 1
 ````
 
 the following expression
+
 ````php
 match CONSTANT with
    CONSTANT => "CONSTANT"
@@ -477,6 +501,7 @@ match CONSTANT with
 ````
 
 returns ```CONSTANT```. With a nonconstant function definition such as
+
 ````php
 CONSTANT = time()
 ````
@@ -492,10 +517,13 @@ the following rule
 ````php
 ifExec(*A==1,assign(*A,0),assign(*A,1),nop,nop) 
 ````
+
 Expanding ```*A``` (say, to 1) before the rule is executed would result in something like
+
 ````php
 ifExec(1==1,assign(1,0),assign(1,1),nop,nop) 
 ````
+
 As a result, extra code has to be written for system microservices to avoid this. With the new rule engine, the value of ```*A`` is retrieved from a runtime environment only when the rule engine tries to evaluate it.
 
 ## Function
@@ -509,17 +537,22 @@ definition is
 ````php
 <name>(<param>, ..., <param>) = <expr> 
 ````
+
 For example
+
 ````php
 square(*n) = *n * *n 
 ````
+
 Function names should be unique (no function-function or function-rule
 name conflict). Functions can be defined in a mutually exclusive manner. For
 example
+
 ````php
 odd(*n) = if *n==0 then false else 
 even(*n-1) even(*n) = if *n==1 then true else odd(*n-1) 
 ````
+
 Here we cannot use ```&&``` or ```||``` because they do not short
 circuit like in C or Java.
 
@@ -532,6 +565,7 @@ To use a function, call it as if it was a microservice.
 ### Rule Definition
 
 The syntax of a rule with a nontrivial rule condition is as follows:
+
 ````php
 <name>(<param>, ..., <param>) { 
   on(<expr>) { <actions> } 
@@ -540,12 +574,15 @@ The syntax of a rule with a nontrivial rule condition is as follows:
 
 If the rule condition is trivial or unnecessary, the rule can be written in
 the simpler form: 
+
 ````php
 <name>(<param>, ..., <param>) { <actions> }
 ````
+
 Multiple rules with the same rule name and parameters list can be combined in
 a more concise syntax where each set of actions is enumerated for each set of
 conditions: 
+
 ````php
 <name>(<param>, ..., <param>) { 
   on(<expr>) { <actions> } ...
@@ -557,11 +594,14 @@ conditions:
 
 Function and rule names have to be valid identifiers. Identifiers start with
 letters followed by letters or digits. For example,
+
 ````php
 ThisIsAValidFunctionNameOrRuleName
 ````
+
 There should not be whitespaces in a
 function name or a rule name. For example
+
 ````php
 This Is Not A Valid Function Name or Rule Name
 ````
@@ -582,22 +622,28 @@ rule {
   on (msi >= 0) { ... } 
 } 
 ````
+
 Conversely, if we want to run a rule when the
 microservice fails, we need to write the rule as 
+
 ````php
 rule { 
   on (errorcode(msi) < 0) { ... } 
 }
 ````
+
 The errormsg microservice captures the error message, allows
 further processing of the error message, and avoiding the default logging of
 the error message
+
 ````php
 rule { 
   on (errormsg(msi, *msg) < 0 ) { ... } 
 } 
 ````
+
 By failure condition 3, the following rule condition always fails because msi returns an integer value 
+
 ````php
 on(msi) { ... }
 ````
@@ -605,30 +651,40 @@ on(msi) { ... }
 ### Generating and Capturing Errors
 
 In a rule, we can also prevent the rule from failing when a microservice fails
+
 ````php
 errorcode(msi)
 ````
+
 The errormsg microservice captures the error message, allows
 further processing of the error message, and avoiding the default logging of
 the error message
+
 ````php
 errormsg(msi, *msg)
 ````
+
 In a rule, the fail and failmsg microservices can be used to generate errors 
+
 ````php
 fail(*errorcode)
 ````
+
 generates an error with an error code
+
 ````php
 failmsg(*errorcode, *errormsg)
 ````
+
 generates an error with an error code and an error message. For example
+
 ````php
 fail(-1)
 failmsg(-1, "this is a user generated error message")
 ````
 
 The msiExit microservice is similar to failmsg
+
 ````php
 msiExit("-1", "msi")
 ````
@@ -645,15 +701,19 @@ To use a rule, call it as if it was a microservice.
 
 The new rule engine provides built-in support for lists. A list can be created
 using the ```list()``` microservice. For example
+
 ````php
 list("This","is","a","list")
 ````
+
 The elements of a list should have the same type. Elements of a list can be
 retrieved using the "elem" microservice. The index starts from 0. For example,
+
 ````php
 elem(list("This","is","a","list"),1)
 ````
-evaluates to "is". 
+
+evaluates to ```"is"```. 
 
 If the index is out of range it fails with error code -1. 
 
@@ -661,20 +721,26 @@ The ```setelem()``` takes in three parameters, a list, an index, and a value,
 and returns a new list that is identical with the list given by the first 
 parameter except that the element at the index given by the second parameter 
 is replace by the value given by the third parameter.
+
 ````php
 setelem(list("This","is","a","list"),1,"isn't")
 ````
+
 evaluates to
+
 ````php
 list("This","isn't","a","list").
 ````
+
 If the index is out of range it fails with an error code. The ```size``` 
 microservice takes in on parameter, a list, and returns the size of the list. 
 
 For example
+
 ````php
 size(list("This","is","a","list"))
 ````
+
 evaluates to ```4```. 
 
 The ```hd()``` microservice returns the first element of a list and
@@ -685,20 +751,28 @@ If the list is empty then it fails with an error code.
 ````php
 hd(list("This","is","a","list"))
 ````
+
 evaluates to "This" and 
+
 ````php
 tl(list("This","is","a","list"))
 ````
+
 evaluates to 
+
 ````php
 list("is","a","list")
 ````
+
 The ```cons()``` microservice returns a list by combining an
 element with another list. For example
+
 ````php
 cons("This",list("is","a","list"))
 ````
+
 evaluates to
+
 ````php
 list("This","is","a","list").
 ````
@@ -706,9 +780,11 @@ list("This","is","a","list").
 #### Tuples
 
 The new rule engine supports built-in data type tuple. 
+
 ````php
 ( <component>, ..., <component> ) 
 ````
+
 Different components may have different types.
 
 #### Interactions with Packing Instructions
@@ -718,7 +794,7 @@ from complex list structures to packing instructions are not yet supported.
 The supported lists types that can be packed are integer lists and string
 lists. When remote execute or delay execution is called while there is a
 complex list in the current runtime environment, an error will be generated.
-For example, in the following rule test {
+For example, in the following rule
 
 ````php
 test {
@@ -730,7 +806,8 @@ test {
 }
 ````
 
-Even though ```*A``` is not used in the delay execution block, the rule will still generate an error. One solution to this is to create a rule with only necessary values. 
+Even though ```*A``` is not used in the delay execution block, the rule will 
+still generate an error. One solution to this is to create a rule with only necessary values. 
 
 ````php
 test {
@@ -747,7 +824,7 @@ test(*B) {
 
 ### Inductive Data Type
 
-The features discussed in this section are currently '''under development'''.
+The features discussed in this section are currently **under development**.
 
 The new rule engine allows defining inductive data types. An inductive data
 type is a data type for values that can be defined inductively, i.e. more
@@ -782,7 +859,7 @@ takes in a ```nat``` value, a left subtree, and a right subtree and constructs a
 tree whose root node value is the "nat" value. The next example shows how to
 define a polymorphic data type. Suppose that we want to generalize our binary
 tree data type to those trees whose value type is not "nat." We give the type
-tree a type parameter X
+tree a type parameter ```X```
 
 ````php
 data tree(X) =
@@ -792,7 +869,7 @@ data tree(X) =
   
 With a type parameter, ```tree``` is not a type, but a unary type constructor. A
 type constructor constructs types from other types. For example, the data type
-of binary trees of natural numbers is "tree(nat)." By default, the rule engine
+of binary trees of natural numbers is ```tree(nat)```. By default, the rule engine
 parses all types with that starts with uppercase letter as type variables.
 
 Just as data constructors, type constructor can also take multiple parameters.
@@ -815,9 +892,11 @@ the data constructor. For example,
 #### Pattern Matching In Assignment
 
 Patterns are similar to expressions. For example
+
 ````php
 pair(*X, *Y)
 ````
+
 There are a few restrictions. First, only data constructors and free variables may appear in
 patterns. Second, each variable only occurs once in a pattern (sometimes
 called linearity). To retrieve the components of ```*A```, we can use patterns on
@@ -826,6 +905,7 @@ the left hand side of an assignment. For example
 ````php
 pair(*X, *Y) = *A;
 ````
+
 When this action is executed, ```*X``` will be assigned to 1 and ```*Y``` will be assigned to ```2```.
 Patterns can be combined with let expressions. For example
 
@@ -856,11 +936,13 @@ pseudo data constructor
 ````php
 lowerdigits(*n) = let *a = *n % 10 in ((*n - *a) / 10 % 10, *a)
 ````
+
 The assignment
 
 ````php
 lowerdigits(*a, *b) = 256;
 ````
+
 results in ```*a``` assigned ```5``` and ```*b``` assigned ```6```.
 
 ## Control Structures
@@ -889,7 +971,7 @@ can use this mechanism to restore the system state to the point before this acti
 The new rule engine make the distinction between expressions and actions. An
 expression does not have a recovery action. An action always has a recovery
 action. If a recovery action is not specified for an action, the rule engine
-use "nop" as the default recovery action.
+use ```nop``` as the default recovery action.
 
 Examples of expressions include the rule condition, and the conditional
 expressions in the ```if```, ```while```, and ```for``` actions.
@@ -908,15 +990,15 @@ nondeterminism.
 
 ### if
 
-The new rule engine has a few useful extensions to the "if" keyword that makes
+The new rule engine has a few useful extensions to the ```if``` keyword that makes
 programming in the rule language more convenient.
 
-In addition to the traditional way of using "if" in the rule language, which
-will be referred to as the "logical if", where you use if as an action which
+In addition to the traditional way of using ```if``` in the rule language, which
+will be referred to as the ```logical if```, where you use if as an action which
 either succeeds or fails with an error code, the new rule engine supports
-another way of using if, which will be referred to as the "functional if". The
-"functional if" may return a value of any type if it succeeds. The two
-different usages have different syntax. The "logical if" has the same syntax
+another way of using if, which will be referred to as the ```functional if```. The
+```functional if``` may return a value of any type if it succeeds. The two
+different usages have different syntax. The ```logical if``` has the same syntax
 as before
 
 ````php
@@ -930,24 +1012,30 @@ if <expr> then <expr> else <expr>
 ````
 
 For example, the following are "functional if"s
+
 ````php
 if true then 1 else 0 
 if *A==1 then true else false 
 ````
+
 To compare, if written in the "logical if" form, the
 second example would be
+
 ````php
 if (*A==1) then { true; } else { false; }
 ````
 
 To make the syntax of "logical if" more concise, the new rule engine allows
 the following abbreviation (where the greyed out part can be abbreviated): 
+
 ````php
 if (...) then { ... } else { ... } 
 if (...) then { ... } else { if (...) then {...} else {...} }
 ````
+
 Multiple abbreviations can be combined for
 example:
+
 ````php
 if (*X==1) { *A = "Mon"; } 
 else if (*X==2) {*A = "Tue"; } 
@@ -959,12 +1047,15 @@ else if (*X==3) {*A = "Wed"; }
 
 The new rule engine allows defining a different variable name for the iterator
 variables in the foreach action. For example
+
 ````php
 foreach(*E in *C) {
   writeLine("stdout", *E); 
 } 
 ````
+
 This is equivalent to
+
 ````php
 foreach(*C) {
   writeLine("stdout", *C); 
@@ -979,6 +1070,7 @@ foreach(*E in list("This", "is", "a", "list")) {
   writeLine("stdout", *E); 
 } 
 ````
+
 This is equivalent to
 
 ````php
@@ -992,10 +1084,26 @@ foreach(*C) {
 
 As function definitions are based on expressions rather than action sequences,
 we cannot put an assignment directly inside an expression. For example, the
-following is not a valid function definition quad(*n) = *t = *n * *n; *t * *t
+following is not a valid function definition 
+
+````php
+quad(*n) = *t = *n * *n; *t * *t
+````
+
 To solve this problem, the let expression provides scoped values in an
-expression. The general syntax for the let expression is let <assignment> in
-<expr> For example, quad(*n) = let *t = *n * *n in *t * *t The variable on the
+expression. The general syntax for the let expression is 
+
+````php
+let <assignment> in <expr> 
+````
+
+For example
+
+````php
+quad(*n) = let *t = *n * *n in *t * *t 
+````
+
+The variable on the
 left hand side of the assignment in the let expression is a let-bound
 variable. The scope of such a variable is within the let expression. A let
 bound variable should not be reassigned inside the let expression.
@@ -1014,15 +1122,13 @@ match <expr> with
   
 For example, given the ```nat``` data type we defined earlier, we can define the
 following function using the ```match``` expression
+
 ````php
 add(*x, *y) =
    match *x with
        | zero => *y
        | succ(*z) => succ(add(*z, *y))
 ````
-
-zero => *y  
----  
 
 For another example, given the "tree" data type we defined earlier, we can
 define the following function
@@ -1034,22 +1140,24 @@ size(*t) =
        | node(*v, *l, *r) => 1 + size(*l) + size(*r)
 ````
 
-
 ## Recovery Chain For Control Structures
 
 ### Sequence
 
 Actions:
+
 ````php
 A1##A2##...##An
 ````
 
 Recovery:
+
 ````php
 R1##R2##...##Rn
 ````
 
 Rulegen syntax: 
+
 ````php
 A1:::R1
 A2:::R2
@@ -1062,17 +1170,20 @@ If Ax fails, then ```Rx, ..., R1``` are executed
 ### Branch
 
 Action: 
+
 ````php
 if(cond, A11##A12##...##A1n, A21##A22##...##A2n,
          R11##R12##...##R1n, R21##R22##...##R2n)
 ````
 
 Recovery:
+
 ````php
 R
 ````
 
 Rulegen syntax:
+
 ````php
 if(cond) then {
     A11:::R11
@@ -1095,16 +1206,20 @@ executed.
 #### ```while```
 
 Action: 
+
 ````php
 while(cond, A1##A2##...##An
             R1##R2##...##Rn)
 ````
+
 Recovery:
+
 ````php
 R
 ````
 
 Rulegen syntax: 
+
 ````php
 while(cond) {
     A1:::R1
@@ -1122,17 +1237,20 @@ from the loop invariant to before the loop is executed.
 #### ```foreach```
 
 Action: 
+
 ````php
 foreach(coll, A1##A2##...##An 
               R1##R2##...##Rn) 
 ````
 
 Recovery: 
+
 ````php
 R
 ````
 
 Rulegen syntax: 
+
 ````php
 foreach(coll) {
     A1:::R1
@@ -1147,15 +1265,20 @@ If ```Ax``` fails, then ```Rx, ..., R1, R``` are executed.
 #### "for"
 
 Action:
+
 ````php
 for(init, cond, incr, A1##A2##...##An
                       R1##R2##...##Rn)
 ````
+
 Recovery:
+
 ````php
 R
 ````
+
 Rulegen syntax:
+
 ````php
 for(init; cond; incr) {
     A1:::R1
@@ -1164,6 +1287,7 @@ for(init; cond; incr) {
     An:::Rn
 }:::R
 ````
+
 If ```Ax``` fails, then ```Rx, ..., R1, R``` are executed. If ```init```, ```cond```, or ```incr``` fails, then ```R``` is executed.
 
 ## Types
@@ -1175,8 +1299,8 @@ time, a restrictive type system may also rule out meaningful expressions. As
 the rule language is a highly dynamic language, the main goal of introducing a
 type system is the following:
 
-  * To enable discovering some errors statically without ruling out most valid rules written for the old rule engine.
-  * To help remove some repetitive type checking and conversion code in microservices by viewing types as contracts of what kinds of values are passed between the rule engine and microservices.
+* To enable discovering some errors statically without ruling out most valid rules written for the old rule engine.
+* To help remove some repetitive type checking and conversion code in microservices by viewing types as contracts of what kinds of values are passed between the rule engine and microservices.
 
 The type system is designed so that the rule language is dynamically typed
 when no type information is given, while providing certain static guarantees
@@ -1215,6 +1339,7 @@ existing iRODS types by viewing the existing iRODS types as opaque types.
 ### Types
 
 The function parameter and return types can be
+
 ````php
 <btype> ::= boolean
           | integer
@@ -1223,6 +1348,7 @@ The function parameter and return types can be
           | time
           | path
 ````
+
 ````php
 <stype> ::= <tvar>                   identifiers starting with uppercase letters
           | iRODS types              back quoted string
@@ -1231,17 +1357,22 @@ The function parameter and return types can be
           | <stype> * … * <stype>    tuple types 
           | c[(<stype>, …, <stype>)] inductive data types
 ````
+
 A function type is
+
 ````php
   <ftype> ::= <quanti>, …, <quanti>, <ptype> * <ptype> * … * <ptype> [*|+|?] -> <stype>
 ````
+
 where 
 * the ```<stype>``` on the right is the return type
 * the optional ```*```, ```+```, or ```?``` indicates varargs
 * the ```<ptype>``` are parameter types of the form
+
 ````php
   <ptype> ::= [(input|output)*|dynamic|actions|expression] [f] <stype>
 ````
+
 where the optional
 * ```input``` indicates that this is an io parameter
     - ```output``` indicates that this is an output parameter
@@ -1250,9 +1381,11 @@ where the optional
     - ```expression``` indicates that this is an expression
     - ```f``` indicates that a coercion can be inserted at compile time based on the coercion relation
 * the ```<quanti>``` are quantifiers of the form
+
 ````php
   <quanti> ::= forall <tvar> [in {<btype> … <btype>}]
 ````
+
 where ```<tvar>``` is a type variable, and the optional set of types provides a bound for the type variable.
 
 ### Typing Constraint
@@ -1279,9 +1412,11 @@ All coercion functions in the coercion relation are total.
 
 For example binary arithmetic operators such as addition and subtraction are
 given type: 
+
 ````php
 forall X in {integer double}, f X * f X -> X
 ````
+
 This indicates that the operator takes in two parameters of the same type and returns a value of
 the same type as its parameters. The parameter type is bounded by {integer
 double}, which means that the micro service applies to only integers or
@@ -1289,43 +1424,59 @@ doubles, but the "f" indicates that if anything can be coerced to these types,
 they can also be accepted with a runtime conversion inserted. Examples:
 
 (a) double + double => X = double 
+
 ````php
 1.0+1.0 
 ````
+
 (b) int + double => X = double 
+
 ````php
 1+1.0
 ````
+
 (c) integer + integer => X = {integer double} 
+
 ````php
 1+1 
 ````
+
 (d) unknown + double => X = double
 Assuming that *A is a fresh variable
+
 ````php
 *A+1.0
 ````
+
 The type checker generate a constraint that the type of ```*A`` can be coerced to double.
 
 (e) unknown + unknown => X = {integer double}
 
-Assuming that *A and *B are fresh variables
+Assuming that ```*A``` and ```*B``` are fresh variables
 
-  * A+*B The type checker generate a constraint that the type of *A can be coerced to either integer or double.
+````php
+*A+*B 
+````
+  
+The type checker generate a constraint that the type of ```*A``` can be coerced to either integer or double.
 
 Some typing constraints can be solved within certain context. For example, if
 we put (e) in to the following context
+
 ````php
 *B = 1.0;
 *B = *A + *B;
 ````
+
 then we can eliminate the possibility that ```*B``` is an integer, thereby narrowing the type variable ```X``` to double.
 
 Some typing constraints can be proved unsolvable. For example,
+
 ````php
 *B = *A + *B;
 *B == "";
 ````
+
 by the second action we know that ```*B``` has to have type string. In this case the rule engine reports a type error.
 
 However, if some typing constraints are not solvable, they are left to be
@@ -1349,13 +1500,13 @@ Once a variable ```*A``` is assigned a value ```X``` the type of the variable is
 type of X can be coerced to type of *A
 ````
 
-For brevity, we sometimes denote the "can be coerced to" relation by "<=". For example,
+For brevity, we sometimes denote the "can be coerced to" relation by ```<=```. For example,
 
 ````php
 type of X <= type of *A
 ````
 
-The reason why the type of *A is not directly assigned to the type of *X is to allow the following usage
+The reason why the type of ```*A``` is not directly assigned to the type of *X is to allow the following usage
 
 ````php
 testTyping2 {
@@ -1378,7 +1529,6 @@ to make the rule pass the type checker.
 As a more complex example, the following generates a type error:
 
 ````php
-
 testTyping4 {
     *A = 1; # integer <= type of *A
     if(*A == "str") { # type error
@@ -1398,14 +1548,18 @@ testTyping2 {
 
 ### Type Declaration
 
-In the new rule engine, you can declare the type of a rule function or a microservice. If the type of an action is declared, then the rule engine will do more static type checking. For example, although
+In the new rule engine, you can declare the type of a rule function or a 
+microservice. If the type of an action is declared, then the rule engine will do
+more static type checking. For example, although
 
 ````php
 concat(*a, *b) = *a ++ *b
 add(*a, *b) = concat(*a, *b)
 ````
 
-does not generate a static type error, ```add(0, 1)``` will generate a dynamic type error. This can be solved (generate static type errors instead of dynamic type errors) by declaring the types of the functions
+does not generate a static type error, ```add(0, 1)``` will generate a dynamic 
+type error. This can be solved (generate static type errors instead of dynamic 
+type errors) by declaring the types of the functions
 
 ````php
 concat : string * string -> string
@@ -1418,44 +1572,67 @@ add(*a, *b) = concat(*a, *b)
 
 ### Automatic Evaluation of Arguments
 
-The new rule engine automatically evaluates expressions within arguments of actions, which is useful when a program needs to pass the result of an expression in as an argument to an action. For example, in the old rule engine, if we want to pass the result of an expression “1+2” as an argument to microservice “msi”, then we need to either write something like:
+The new rule engine automatically evaluates expressions within arguments of 
+actions, which is useful when a program needs to pass the result of an 
+expression in as an argument to an action. For example, in the old rule engine, 
+if we want to pass the result of an expression “1+2” as an argument to 
+microservice ```msi```, then we need to either write something like:
 
 ````php
 *A=1+2;
 msi(*A);
 ````
 
-or pass ```1+2``` in as a string to ```msi``` and write code in the microservice which parses and evaluates the expression. With the new rule engine, the programmer can write:
+or pass ```1+2``` in as a string to ```msi``` and write code in the 
+microservice which parses and evaluates the expression. With the new rule 
+engine, the programmer can write:
 
 ````php  
 msi(1+2);
 ````
 
 and the rule engine will evaluates the expression
+
 ````php
 1+2
 ````
+
 and pass the result in.
 
 ### The Return Value of User Defined Microservices
 
-Both the old rule engine and the new rule engine view the return value of user defined microservices as an integer "errorcode." If the return value of a microservice is less than zero, both rule engines interpret it as a failure, rather than an integer value; and if the return value is greater than zero, both rule engines interpret it as an integer. Therefore the following expression
+Both the old rule engine and the new rule engine view the return value of user 
+defined microservices as an integer "errorcode." If the return value of a 
+microservice is less than zero, both rule engines interpret it as a failure, 
+rather than an integer value; and if the return value is greater than zero, both 
+rule engines interpret it as an integer. Therefore the following expression
 
 ````php  
 msi >= 0
 ````
 
-either evaluates to true or fail, since when "msi" returns a negative integer, the rule engine interprets the value as a failure.
-In some applications, there is need for capturing all possible return values as regular integers. The "errorcode" microservice provided by the new rule engine can be used to achieve this. In the previous example, we can modify the code to
+either evaluates to true or fail, since when ```msi``` returns a negative 
+integer, the rule engine interprets the value as a failure.
+In some applications, there is need for capturing all possible return values as 
+regular integers. The "errorcode" microservice provided by the new rule engine 
+can be used to achieve this. In the previous example, we can modify the code to
 
 ````php
 errorcode(msi) >= 0
 ````
+
 This expression will not fail on negative return values from msi.
 
 ### The Administration Microservices
 
-The rule engine has three groups of rule administration microservices. The changes made by the first group are system wide. They affect subsequent execution of the irule command and other parts of the iRODS system such as delayed execution. The changes made by second group only affects the current irule command. Subsequent execution of the irule command and other parts of the iRODS system will not be affected by these changes. The third group reads rules from or writes rules to files or the database.
+The rule engine has three groups of rule administration microservices. The 
+changes made by the first group are system wide. They affect subsequent 
+execution of the irule command and other parts of the iRODS system such as 
+delayed execution. The changes made by second group only affects the current 
+irule command. Subsequent execution of the irule command and other parts of the 
+iRODS system will not be affected by these changes. The third group reads rules 
+from or writes rules to files or the database.
+
 The first group includes
 
 ````php
@@ -1473,6 +1650,7 @@ msiAdmShowIRB
 ````
 
 The third group includes
+
 ````php
 msiAdmWriteRulesFromStructIntoFile
 msiAdmReadRulesFromFileIntoStruct
@@ -1493,7 +1671,10 @@ There error messages can be found in the server log.
 
 ### Indexing
 
-To improve the performance of rule execution, the new rule engine provide two level indexing on applicable rules. The first level of indexing is based on the rule name. The second level of indexing is based on rule conditions. The rule condition indexing can be demonstrate by the following example:
+To improve the performance of rule execution, the new rule engine provide two 
+level indexing on applicable rules. The first level of indexing is based on the 
+rule name. The second level of indexing is based on rule conditions. The rule 
+condition indexing can be demonstrate by the following example:
   
 ````php
 testRule(*A) {
@@ -1502,7 +1683,9 @@ testRule(*A) {
 }
 ````
 
-In this example, we have two rules with the same rule name, but different rule conditions. The first level of indexing does not improve the performance in a rule application like
+In this example, we have two rules with the same rule name, but different rule 
+conditions. The first level of indexing does not improve the performance in a 
+rule application like
 
 ````php
 testRule("a")
@@ -1587,13 +1770,17 @@ In the old rule engine, the follow code matches ```$objPath``` with the pattern 
 acPostProcForPut|$objPath like *txt|nop|nop
 ````
 
-In the new rule engine, even in backward compatibility modes, it matches $objPath with the content of the ```*txt``` variable, as the ```*``` character is followed by a letter. (Node: if the string is ```*.txt``` then there is no ambiguity) To match with the pattern ```*txt```, change the rule to
+In the new rule engine, even in backward compatibility modes, it matches 
+```$objPath``` with the content of the ```*txt``` variable, as the ```*``` 
+character is followed by a letter. (Node: if the string is ```*.txt``` then 
+there is no ambiguity) To match with the pattern ```*txt```, change the rule to
 
 ````php
 acPostProcForPut|$objPath like \*txt|nop|nop
 ````
 
-The ```\``` character escapes the ```*``` character following it and turns it from a variable prefix into a normal character.
+The ```\``` character escapes the ```*``` character following it and turns it 
+from a variable prefix into a normal character.
 
 #### Foreach with Comma Separated Strings
 
@@ -1624,7 +1811,11 @@ The old rule engine allows the following code:
 rule|msiDoSomething|nop|nop
 ````
 
-The rule is executed only if the microservice "msiDoSomething" succeeds. A microservice is considered successful if it return an integer >=0 (usually 0) and failed if it returns an integer < 0. The new rule engine requires the rule condition to be a boolean expression which returns either true or false. We could add the following implicit conversion rules:
+The rule is executed only if the microservice ```msiDoSomething``` succeeds. A 
+microservice is considered successful if it return an integer >=0 (usually 0) 
+and failed if it returns an integer < 0. The new rule engine requires the rule 
+condition to be a boolean expression which returns either true or false. We 
+could add the following implicit conversion rules:
 
 ````php
 integer >= 0 -> true
@@ -1638,7 +1829,8 @@ integer != 0 -> true
 integer == 0 -> false
 ```` 
 
-which would lead to confusion. Therefore, we didn't include those two implicit conversion rules. The example, however, can be written in the new rule engine as follows:
+which would lead to confusion. Therefore, we didn't include those two implicit 
+conversion rules. The example, however, can be written in the new rule engine as follows:
 
 ````php
 rule {
@@ -1646,6 +1838,7 @@ rule {
    }
 }
 ````
+
 Note that to test for the failure case, you can use the errorcode function:
 
 ````php
@@ -1677,7 +1870,8 @@ The new rule engine returns
 unquoted string 0 + 1
 ````
 
-In the new rule engine, if you use the "##" syntax, then all values of input parameters are strings, quoted or unquoted. In the newer syntax, it can be written as
+In the new rule engine, if you use the "##" syntax, then all values of input 
+parameters are strings, quoted or unquoted. In the newer syntax, it can be written as
 
 ````php
 testrule {
@@ -1687,17 +1881,25 @@ input *A="unquoted string", *D=0 + 1
 output ruleExecOut
 ````
 
-Note that rules written in the ```##``` syntax have to be saved in a ```.ir``` file and rules written in the newer notation have to be saved in a ```.r``` file.
+Note that rules written in the ```##``` syntax have to be saved in a ```.ir``` 
+file and rules written in the newer notation have to be saved in a ```.r``` file.
 
 ## Converting from the ```##``` Syntax to the New Rule Engine Syntax
 
-In the 3.0 release of iRODS, a new rule engine is included that eliminates some corner cases where it was ambiguous, such as special charaters in strings, by following the conventions of mainstream programming languages. The resulting syntax is slightly different from the old rule engine. The old rule engine provides two syntaxes for writing rules. The first syntax (the "##" syntax), as found in the core.irb file, looks like:
+In the 3.0 release of iRODS, a new rule engine is included that eliminates some 
+corner cases where it was ambiguous, such as special charaters in strings, by 
+following the conventions of mainstream programming languages. The resulting 
+syntax is slightly different from the old rule engine. The old rule engine 
+provides two syntaxes for writing rules. The first syntax (the "##" syntax), 
+as found in the core.irb file, looks like:
 
 ````php
 acPostProcForPut|$objPath like *.txt|msiDataObjCopy($objPath, "$objPath.copy")|nop
 ````
 
-It has the restriction that every rule must be written in one line for fast processing. The second syntax (the rulegen syntax) is a more readable form and supports multi-line rules.
+It has the restriction that every rule must be written in one line for fast 
+processing. The second syntax (the rulegen syntax) is a more readable form and 
+supports multi-line rules.
 
 ````php
 acPostProcForPut {
@@ -1725,12 +1927,13 @@ compares the content of *A with the string "0 + 1", and
 ````php
 *A == 0 + 1
 ````
+
 compares the content of ```*A``` with the integer expression ```0 + 1```.
 
 To make it easier to move rules written in the ```##``` syntax, the new rule engine provides backward compatible modes. Backward compatible modes tweak the rule engine parser and type checker so that they simulate the old rule engine when parsing the "##" syntax. In backward compatible mode, strings do not have to be quoted. Backward compatible modes work only with the ```##``` syntax. Backward compatible modes can be changed within a code base using the ```@backwardCompatible``` directive, so that users can have rules that run under backward compatible modes and not in just one code base. The backward compatible modes and their limitations are explained in Changes_and_Improvements_to_the_Rule_Language_and_the_Rule_Engine#Backward Compatibility.
 The old rule engine is also included in the 3.0 release in case full backward compatibility is needed. The rule engine used by iRODS can be easily switched to the old one by making a small change in the server Makefile and rebuilding the server.
 
-This section explains how to convert a rule written in the ```##``` syntax to the new rule engine syntax. First, we look at a rule written in the "##" syntax.
+This section explains how to convert a rule written in the ```##``` syntax to the new rule engine syntax. First, we look at a rule written in the ```##``` syntax.
 
 ````php
  My Test Rule(*arg)|msi(*arg) && *arg like *txt|delayExec(<A></A>, copyDataObj(*objPath)##moveDataObj(*objPath), nop##nop)##remoteExec(localhost, null, writeLine(stdout, *D), nop)##assign(*A, "a, b, c")##assign(*B, *A string)##forEachExec(*A, writeLine(serverLog, *A), nop)|nop
@@ -1765,7 +1968,7 @@ My Test Rule(*arg)
 ruleExecOut
 ````
 
-#### 2. Convert "|"s to rulegen syntax 
+#### 2. Convert ```|```s to rulegen syntax 
 
 ````php
 My Test Rule(*arg) {
@@ -1788,7 +1991,7 @@ My Test Rule(*arg) {
 ruleExecOut
 ````
  
-#### 3. Convert "##"s to ";" 
+#### 3. Convert ```##```s to ```;``` 
 
 ````php
 My Test Rule(*arg) {
