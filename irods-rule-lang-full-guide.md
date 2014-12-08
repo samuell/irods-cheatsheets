@@ -549,8 +549,8 @@ name conflict). Functions can be defined in a mutually exclusive manner. For
 example
 
 ````php
-odd(*n) = if *n==0 then false else 
-even(*n-1) even(*n) = if *n==1 then true else odd(*n-1) 
+odd(*n) = if *n==0 then false else even(*n-1)
+even(*n) = if *n==1 then true else odd(*n-1)
 ````
 
 Here we cannot use ```&&``` or ```||``` because they do not short
