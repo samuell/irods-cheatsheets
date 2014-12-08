@@ -26,7 +26,9 @@ HelloWorld {
 @include "definitions" 
 ````
 
-## Boolean operators
+## Operators
+
+### Boolean
 
 ````php
 true  # True
@@ -35,6 +37,27 @@ false # False
 &&    # And
 ||    # Or
 %%    # Or used in the "##" syntax
+````
+
+### Arithmetic
+
+````php
+-  # Negation
+^  # Power
+*  # Multiplication 
+/  # Division 
+%  # Modulors
+-  # Subtraction 
++  # Addition
+>  # Greater than
+<  # Less than
+>= # Greater than or equal
+<= # Less than or equal
+````
+
+### Strings
+````php
+++ # String concatenation
 ````
 
 ## Numbers
@@ -47,21 +70,6 @@ floor(1.5) # Will return integer 1
 ceiling(1.5) # Will return integer 2
 ````
 Note: Integer division as found in C, C++, and Java is not implemented. Instead, division between integers is the same as division between doubles.
-
-### Arithmetic operators
-````php
--  # Negation
-^  # Power
-*  # Multiplication 
-/  # Division 
-%  # Modulo
--  # Subtraction 
-+  # Addition
->  # Greater than
-<  # Less than
->= # Greater than or equal
-<= # Less than or equal
-````
 
 ### Arithmetic functions
 ````php
@@ -83,11 +91,6 @@ Note: Integer division as found in C, C++, and Java is not implemented. Instead,
 "This is also a string"
 "Strings are quoted with \"\", or '' characters"
 "Some escape characters: \n, \r, \t, \\, \', \", \$, \*"
-````
-
-### String operators
-````php
-++ # String concatenation
 ````
 
 ### String functions
